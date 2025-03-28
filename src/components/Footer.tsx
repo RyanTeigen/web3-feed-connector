@@ -15,6 +15,9 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground">
               A decentralized Web3 feed connector bringing together Autheo's social presence in one place.
             </p>
+            <p className="text-sm font-semibold text-web3-electric-blue">
+              Build. Connect. Own.
+            </p>
           </div>
           
           <div className="space-y-4">
