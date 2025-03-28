@@ -12,7 +12,7 @@ const Footer = () => {
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-web3-deep-purple to-web3-vibrant-teal"></div>
               <span className="text-xl font-bold gradient-text">Autheo Connect</span>
             </Link>
-            <p className="text-sm text-center font-semibold text-web3-electric-blue">
+            <p className="text-sm font-semibold text-web3-electric-blue">
               Build. Connect. Own.
             </p>
           </div>
