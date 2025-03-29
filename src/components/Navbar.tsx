@@ -16,9 +16,12 @@ const Navbar = () => {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-web3-deep-purple to-web3-vibrant-teal animate-pulse-glow"></div>
-              <span className="text-xl font-bold gradient-text">Autheo Connect</span>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/b6c63bd0-85fc-4221-b7f4-f2a40f8901d5.png" 
+                alt="Autheo Logo" 
+                className="h-10 w-auto"
+              />
             </Link>
           </div>
           

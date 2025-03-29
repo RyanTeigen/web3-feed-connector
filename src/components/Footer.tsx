@@ -8,9 +8,12 @@ const Footer = () => {
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-web3-deep-purple to-web3-vibrant-teal"></div>
-              <span className="text-xl font-bold gradient-text">Autheo Connect</span>
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/lovable-uploads/b6c63bd0-85fc-4221-b7f4-f2a40f8901d5.png" 
+                alt="Autheo Logo" 
+                className="h-10 w-auto"
+              />
             </Link>
             <p className="text-sm font-semibold text-web3-electric-blue">
               Build. Connect. Own.
