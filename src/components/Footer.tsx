@@ -15,7 +15,7 @@ const Footer = () => {
                 className="h-10 w-auto"
               />
             </Link>
-            <p className="text-sm font-semibold text-web3-electric-blue">
+            <p className="text-sm font-semibold text-secondary">
               Build. Connect. Own.
             </p>
           </div>
@@ -24,13 +24,13 @@ const Footer = () => {
             <h3 className="text-lg font-semibold">Quick Links</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">Home</Link>
+                <Link to="/" className="text-muted-foreground hover:text-secondary transition-colors">Home</Link>
               </li>
               <li>
-                <Link to="/feeds" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">Feeds</Link>
+                <Link to="/feeds" className="text-muted-foreground hover:text-secondary transition-colors">Feeds</Link>
               </li>
               <li>
-                <Link to="/about" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">About Autheo</Link>
+                <Link to="/about" className="text-muted-foreground hover:text-secondary transition-colors">About Autheo</Link>
               </li>
             </ul>
           </div>
@@ -38,19 +38,19 @@ const Footer = () => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Connect With Us</h3>
             <div className="flex space-x-4">
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
                 <Twitter className="h-5 w-5" />
                 <span className="sr-only">Twitter</span>
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
                 <Github className="h-5 w-5" />
                 <span className="sr-only">GitHub</span>
               </a>
-              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">
+              <a href="https://discord.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
                 <MessageSquare className="h-5 w-5" />
                 <span className="sr-only">Discord</span>
               </a>
-              <a href="https://autheo.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-web3-electric-blue transition-colors">
+              <a href="https://autheo.com" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-secondary transition-colors">
                 <Globe className="h-5 w-5" />
                 <span className="sr-only">Website</span>
               </a>
