@@ -1,36 +1,30 @@
-
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-// Stars component for the animated background
 const Stars = () => {
   useEffect(() => {
     const container = document.querySelector('.stars-container');
     if (!container) return;
 
-    // Create stars
     const starCount = 50;
     for (let i = 0; i < starCount; i++) {
       const star = document.createElement('div');
       star.classList.add('star');
       
-      // Random size
       const size = Math.random() * 3 + 1;
       star.style.width = `${size}px`;
       star.style.height = `${size}px`;
       
-      // Random position
       star.style.top = `${Math.random() * 100}%`;
       star.style.left = `${Math.random() * 100}%`;
       
-      // Random animation duration
       const duration = Math.random() * 60 + 30;
       star.style.animationDuration = `${duration}s, ${Math.random() * 3 + 2}s`;
       
-      // Random delay
-      star.style.animationDelay = `${Math.random() * 30}s, ${Math.random() * 2}s`;
+      const delay = Math.random() * 30;
+      star.style.animationDelay = `${delay}s, ${Math.random() * 2}s`;
       
       container.appendChild(star);
     }
@@ -80,7 +74,7 @@ const Navbar = () => {
               <Link to="/about" className="px-3 py-2 text-sm font-medium hover:text-secondary transition-colors">
                 About
               </Link>
-              <Button className="web3-button">Connect Wallet</Button>
+              <Button className="web3-button text-web3-electric-blue">Connect Wallet</Button>
             </div>
           </div>
           
@@ -119,7 +113,7 @@ const Navbar = () => {
             >
               About
             </Link>
-            <Button className="web3-button w-full mt-4">Connect Wallet</Button>
+            <Button className="web3-button w-full mt-4 text-web3-electric-blue">Connect Wallet</Button>
           </div>
         </div>
       )}
