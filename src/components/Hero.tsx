@@ -22,7 +22,7 @@ const Hero = () => {
             providing a seamless experience for following updates across the decentralized web.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Button asChild className="web3-button bg-sky-500 hover:bg-sky-600 text-white">
+            <Button asChild className="web3-button">
               <Link to="/feeds">
                 Explore Feeds <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
