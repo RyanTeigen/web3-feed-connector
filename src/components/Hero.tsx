@@ -15,9 +15,9 @@ const Hero = () => {
           <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
             <span className="gradient-text">Decentralized Content.</span>
             <br />
-            <span className="text-foreground">One Unified Experience.</span>
+            <span className="text-web3-electric-blue">One Unified Experience.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-web3-electric-blue">
             Autheo Connect aggregates social feeds and Web3 content in one place, 
             providing a seamless experience for following updates across the decentralized web.
           </p>
