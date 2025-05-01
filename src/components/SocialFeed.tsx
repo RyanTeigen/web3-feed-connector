@@ -9,6 +9,7 @@ import { TelegramFeed } from "./social-feed/TelegramFeed";
 import { YoutubeFeed } from "./social-feed/YoutubeFeed";
 import { BlogFeed } from "./social-feed/BlogFeed";
 import { DEFAULT_CONFIG } from "./social-feed/config";
+import { ThemeToggle } from "./ThemeToggle";
 
 const SocialFeed = () => {
   const [activeTab, setActiveTab] = useState("twitter");
@@ -18,9 +19,12 @@ const SocialFeed = () => {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <h2 className="text-3xl font-bold mb-10 text-center">
-          <span className="gradient-text">Autheo Social Feeds</span>
-        </h2>
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-3xl font-bold text-center">
+            <span className="gradient-text">Autheo Social Feeds</span>
+          </h2>
+          <ThemeToggle />
+        </div>
         
         <Tabs defaultValue="twitter" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-6 mb-8">

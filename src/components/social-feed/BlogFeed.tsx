@@ -3,24 +3,38 @@ import { Card } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SOCIAL_FEEDS } from "./config";
+import { useTheme } from "@/context/ThemeContext";
 
 interface BlogFeedProps {
   blogUrl: string;
 }
 
 export const BlogFeed = ({ blogUrl }: BlogFeedProps) => {
+  const { theme } = useTheme();
+  
   return (
     <div className="space-y-6">
       {SOCIAL_FEEDS.blog.map((post) => (
-        <Card key={post.id} className="web3-card">
+        <Card 
+          key={post.id} 
+          className={`web3-card ${
+            theme === "light" 
+              ? "bg-white border-gray-200 text-gray-800" 
+              : "bg-card border-border/40 text-foreground"
+          }`}
+        >
           <div className="space-y-3">
-            <h3 className="font-semibold text-xl">{post.title}</h3>
-            <p className="text-muted-foreground">{post.excerpt}</p>
+            <h3 className={`font-semibold text-xl ${theme === "light" ? "text-gray-800" : ""}`}>{post.title}</h3>
+            <p className={`${theme === "light" ? "text-gray-600" : "text-muted-foreground"}`}>{post.excerpt}</p>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">{post.readTime}</span>
-              <span className="text-muted-foreground">{post.date}</span>
+              <span className={`${theme === "light" ? "text-gray-500" : "text-muted-foreground"}`}>{post.readTime}</span>
+              <span className={`${theme === "light" ? "text-gray-500" : "text-muted-foreground"}`}>{post.date}</span>
             </div>
-            <Button variant="outline" className="border-web3-vibrant-teal/40 hover:bg-web3-vibrant-teal/10 text-web3-vibrant-teal">
+            <Button variant="outline" className={
+              theme === "light"
+                ? "border-web3-vibrant-teal/40 hover:bg-web3-vibrant-teal/10 text-web3-vibrant-teal"
+                : "border-web3-vibrant-teal/40 hover:bg-web3-vibrant-teal/10 text-web3-vibrant-teal"
+            }>
               Read More
             </Button>
           </div>
