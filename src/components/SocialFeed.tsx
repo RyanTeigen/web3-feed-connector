@@ -1,9 +1,29 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Twitter, MessageSquare, Youtube, Globe, ExternalLink } from "lucide-react";
+import { Twitter, MessageSquare, Youtube, Globe, ExternalLink, Linkedin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Default configuration for the feed aggregator
+const DEFAULT_CONFIG = {
+  display_name: "Autheo User",
+  social_accounts: {
+    twitter: "https://x.com/Autheo_Network",
+    linkedin: "https://www.linkedin.com/company/autheo/",
+    discord: "https://discord.gg/a9WQrEzD",
+    telegram: "https://t.me/autheo"
+  },
+  update_frequency: 30, // in minutes
+  content_filters: ["web3", "blockchain", "social"],
+  display_preferences: {
+    sort_by: "newest",
+    media_display: "expanded",
+    notification_level: "mentions"
+  },
+  auth_method: "wallet_signature",
+  custom_theme: "default",
+  language_preference: "en"
+};
 
 // Mock data for social feeds
 const SOCIAL_FEEDS = {
@@ -104,11 +124,66 @@ const SOCIAL_FEEDS = {
       readTime: "6 min read",
       date: "1 month ago"
     }
+  ],
+  linkedin: [
+    {
+      id: "l1",
+      author: "Autheo",
+      role: "Web3 Platform",
+      content: "We're excited to announce our latest partnership with major blockchain infrastructure providers to enhance our decentralized social platform.",
+      date: "1 week ago",
+      likes: 87,
+      comments: 12
+    },
+    {
+      id: "l2",
+      author: "Autheo",
+      role: "Web3 Platform",
+      content: "Join our upcoming webinar on how Web3 is transforming content creation and monetization for creators across the digital ecosystem.",
+      date: "2 weeks ago",
+      likes: 54,
+      comments: 8
+    },
+    {
+      id: "l3",
+      author: "Autheo",
+      role: "Web3 Platform",
+      content: "Looking for talented developers passionate about Web3 technologies! Check out our careers page for exciting opportunities to join our growing team.",
+      date: "3 weeks ago",
+      likes: 132,
+      comments: 23
+    }
+  ],
+  
+  telegram: [
+    {
+      id: "tg1",
+      author: "Autheo Admin",
+      content: "🚀 New protocol update v0.9.3 is now available! Check our GitHub for the details.",
+      date: "1 day ago",
+      views: 2456
+    },
+    {
+      id: "tg2",
+      author: "Autheo Admin",
+      content: "Join our AMA session this Thursday at 3PM UTC with our lead developers to discuss upcoming features!",
+      date: "3 days ago", 
+      views: 1872
+    },
+    {
+      id: "tg3",
+      author: "Autheo Admin",
+      content: "Community poll: What features would you like to see prioritized in our Q3 roadmap? Vote now!",
+      date: "1 week ago",
+      views: 3218
+    }
   ]
 };
 
 const SocialFeed = () => {
   const [activeTab, setActiveTab] = useState("twitter");
+  // In a real application, this would come from user settings or API
+  const [config, setConfig] = useState(DEFAULT_CONFIG);
 
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
@@ -118,14 +193,22 @@ const SocialFeed = () => {
         </h2>
         
         <Tabs defaultValue="twitter" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="twitter" className="flex items-center space-x-2">
               <Twitter className="h-4 w-4" />
               <span>Twitter</span>
             </TabsTrigger>
+            <TabsTrigger value="linkedin" className="flex items-center space-x-2">
+              <Linkedin className="h-4 w-4" />
+              <span>LinkedIn</span>
+            </TabsTrigger>
             <TabsTrigger value="discord" className="flex items-center space-x-2">
               <MessageSquare className="h-4 w-4" />
               <span>Discord</span>
+            </TabsTrigger>
+            <TabsTrigger value="telegram" className="flex items-center space-x-2">
+              <Send className="h-4 w-4" />
+              <span>Telegram</span>
             </TabsTrigger>
             <TabsTrigger value="youtube" className="flex items-center space-x-2">
               <Youtube className="h-4 w-4" />
@@ -163,8 +246,42 @@ const SocialFeed = () => {
             ))}
             <div className="flex justify-center mt-8">
               <Button asChild className="web3-button">
-                <a href="https://twitter.com/AutheoProject" target="_blank" rel="noopener noreferrer">
+                <a href={config.social_accounts.twitter} target="_blank" rel="noopener noreferrer">
                   View More Tweets
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="linkedin" className="space-y-6">
+            {SOCIAL_FEEDS.linkedin.map((post) => (
+              <Card key={post.id} className="web3-card">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 rounded-full bg-blue-500/20 flex items-center justify-center">
+                        <Linkedin className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <div className="font-semibold">{post.author}</div>
+                        <div className="text-sm text-muted-foreground">{post.role}</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">{post.date}</div>
+                  </div>
+                  <p className="text-foreground">{post.content}</p>
+                  <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+                    <span>{post.likes} likes</span>
+                    <span>{post.comments} comments</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            <div className="flex justify-center mt-8">
+              <Button asChild className="web3-button">
+                <a href={config.social_accounts.linkedin} target="_blank" rel="noopener noreferrer">
+                  View LinkedIn Profile
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
@@ -193,8 +310,40 @@ const SocialFeed = () => {
             ))}
             <div className="flex justify-center mt-8">
               <Button asChild className="web3-button">
-                <a href="https://discord.gg/autheo" target="_blank" rel="noopener noreferrer">
+                <a href={config.social_accounts.discord} target="_blank" rel="noopener noreferrer">
                   Join Our Discord
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </a>
+              </Button>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="telegram" className="space-y-6">
+            {SOCIAL_FEEDS.telegram.map((message) => (
+              <Card key={message.id} className="web3-card">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 rounded-full bg-web3-vibrant-teal/20 flex items-center justify-center">
+                        <Send className="h-5 w-5 text-web3-vibrant-teal" />
+                      </div>
+                      <div>
+                        <div className="font-semibold">{message.author}</div>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">{message.date}</div>
+                  </div>
+                  <p className="text-foreground">{message.content}</p>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <span>{message.views} views</span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+            <div className="flex justify-center mt-8">
+              <Button asChild className="web3-button">
+                <a href={config.social_accounts.telegram} target="_blank" rel="noopener noreferrer">
+                  Join Our Telegram
                   <ExternalLink className="ml-2 h-4 w-4" />
                 </a>
               </Button>
