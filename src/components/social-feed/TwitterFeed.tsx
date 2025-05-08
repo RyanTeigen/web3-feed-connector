@@ -7,13 +7,17 @@ import { SOCIAL_FEEDS } from "./config";
 
 interface TwitterFeedProps {
   twitterUrl: string;
+  feedData?: any[];
 }
 
-export const TwitterFeed = ({ twitterUrl }: TwitterFeedProps) => {
+export const TwitterFeed = ({ twitterUrl, feedData }: TwitterFeedProps) => {
+  // If we have feed data from the API, use it. Otherwise, fall back to mock data
+  const tweets = feedData?.length ? feedData.map(item => item.content) : SOCIAL_FEEDS.twitter;
+
   return (
     <div className="space-y-6">
-      {SOCIAL_FEEDS.twitter.map((tweet) => (
-        <Card key={tweet.id} className="web3-card">
+      {tweets.map((tweet: any, index: number) => (
+        <Card key={tweet.id || index} className="web3-card">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">

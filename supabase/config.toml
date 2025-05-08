@@ -1,1 +1,5 @@
+
 project_id = "nooalqkkbkrrbsrqnaqg"
+
+[functions.fetch-social-feeds]
+verify_jwt = true
