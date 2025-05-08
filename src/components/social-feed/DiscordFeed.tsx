@@ -6,12 +6,16 @@ import { SOCIAL_FEEDS } from "./config";
 
 interface DiscordFeedProps {
   discordUrl: string;
+  feedData?: any[];
 }
 
-export const DiscordFeed = ({ discordUrl }: DiscordFeedProps) => {
+export const DiscordFeed = ({ discordUrl, feedData }: DiscordFeedProps) => {
+  // If we have feed data from the API, use it. Otherwise, fall back to mock data
+  const messages = feedData?.length ? feedData.map(item => item.content) : SOCIAL_FEEDS.discord;
+  
   return (
     <div className="space-y-6">
-      {SOCIAL_FEEDS.discord.map((message) => (
+      {messages.map((message) => (
         <Card key={message.id} className="web3-card">
           <div className="space-y-3">
             <div className="flex items-center justify-between">

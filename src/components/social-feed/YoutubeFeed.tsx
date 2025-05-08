@@ -6,12 +6,16 @@ import { SOCIAL_FEEDS } from "./config";
 
 interface YoutubeFeedProps {
   youtubeUrl: string;
+  feedData?: any[];
 }
 
-export const YoutubeFeed = ({ youtubeUrl }: YoutubeFeedProps) => {
+export const YoutubeFeed = ({ youtubeUrl, feedData }: YoutubeFeedProps) => {
+  // If we have feed data from the API, use it. Otherwise, fall back to mock data
+  const videos = feedData?.length ? feedData.map(item => item.content) : SOCIAL_FEEDS.youtube;
+  
   return (
     <div className="space-y-6">
-      {SOCIAL_FEEDS.youtube.map((video) => (
+      {videos.map((video) => (
         <Card key={video.id} className="web3-card overflow-hidden">
           <div className="flex flex-col sm:flex-row">
             <div className="sm:w-1/3">

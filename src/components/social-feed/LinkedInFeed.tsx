@@ -6,12 +6,16 @@ import { SOCIAL_FEEDS } from "./config";
 
 interface LinkedInFeedProps {
   linkedinUrl: string;
+  feedData?: any[];
 }
 
-export const LinkedInFeed = ({ linkedinUrl }: LinkedInFeedProps) => {
+export const LinkedInFeed = ({ linkedinUrl, feedData }: LinkedInFeedProps) => {
+  // If we have feed data from the API, use it. Otherwise, fall back to mock data
+  const posts = feedData?.length ? feedData.map(item => item.content) : SOCIAL_FEEDS.linkedin;
+  
   return (
     <div className="space-y-6">
-      {SOCIAL_FEEDS.linkedin.map((post) => (
+      {posts.map((post) => (
         <Card key={post.id} className="web3-card">
           <div className="space-y-3">
             <div className="flex items-center justify-between">

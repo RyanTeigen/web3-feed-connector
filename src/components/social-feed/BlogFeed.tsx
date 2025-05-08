@@ -7,14 +7,18 @@ import { useTheme } from "@/context/ThemeContext";
 
 interface BlogFeedProps {
   blogUrl: string;
+  feedData?: any[];
 }
 
-export const BlogFeed = ({ blogUrl }: BlogFeedProps) => {
+export const BlogFeed = ({ blogUrl, feedData }: BlogFeedProps) => {
   const { theme } = useTheme();
+  
+  // If we have feed data from the API, use it. Otherwise, fall back to mock data
+  const posts = feedData?.length ? feedData.map(item => item.content) : SOCIAL_FEEDS.blog;
   
   return (
     <div className="space-y-6">
-      {SOCIAL_FEEDS.blog.map((post) => (
+      {posts.map((post) => (
         <Card 
           key={post.id} 
           className={`web3-card ${
