@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Set up auth state listener FIRST to prevent missing auth events
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Only update synchronous state here, no async operations
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -31,6 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.log('User signed in:', session?.user?.email);
         } else if (event === 'SIGNED_OUT') {
           console.log('User signed out');
+        } else if (event === 'TOKEN_REFRESHED') {
+          console.log('Auth token refreshed');
+        } else if (event === 'USER_UPDATED') {
+          console.log('User updated');
         }
       }
     );

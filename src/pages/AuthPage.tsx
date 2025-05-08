@@ -28,6 +28,27 @@ const AuthPage = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate inputs before attempting authentication
+    if (!email || !email.includes('@') || !password) {
+      toast({
+        variant: "destructive",
+        title: "Invalid input",
+        description: "Please enter a valid email and password",
+      });
+      return;
+    }
+
+    // Minimum password length check
+    if (activeTab === "signup" && password.length < 6) {
+      toast({
+        variant: "destructive",
+        title: "Password too short",
+        description: "Password must be at least 6 characters long",
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -129,6 +150,7 @@ const AuthPage = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 placeholder="you@example.com"
+                autoComplete="email"
               />
             </div>
             
@@ -143,6 +165,8 @@ const AuthPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
+                autoComplete={activeTab === "login" ? "current-password" : "new-password"}
+                minLength={6}
               />
             </div>
             
@@ -207,6 +231,7 @@ const AuthPage = () => {
                 <li>Email verification might be required for new accounts</li>
                 <li>Check your email spam folder for verification emails</li>
                 <li>Password must be at least 6 characters long</li>
+                <li>Ensure your Supabase project has the correct authentication settings</li>
               </ul>
             </div>
           </div>
