@@ -12,15 +12,15 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { Json } from "@/integrations/supabase/types";
 
-// Define the feed preferences interface that's compatible with Json type
-interface FeedPreferences {
-  [key: string]: boolean; // Add index signature to make it compatible with Json type
+// Define a type that works with both our component and Json type
+type FeedPreferences = {
   twitter: boolean;
   discord: boolean;
   telegram: boolean;
   blog: boolean;
   youtube: boolean;
-}
+  [key: string]: boolean;
+};
 
 export const ProfileOnboarding = () => {
   const { user } = useAuth();
@@ -87,13 +87,13 @@ export const ProfileOnboarding = () => {
         
       if (profileError) throw profileError;
       
-      // Update preferences
+      // Update preferences - explicitly cast feed_preferences to Json
       const { error: prefsError } = await supabase
         .from("user_preferences")
         .update({
           theme: preferences.theme,
           notification_enabled: preferences.notification_enabled,
-          feed_preferences: preferences.feed_preferences,
+          feed_preferences: preferences.feed_preferences as unknown as Json,
         })
         .eq("user_id", user.id);
         
@@ -158,9 +158,10 @@ export const ProfileOnboarding = () => {
         let feedPreferences: FeedPreferences;
         
         if (prefsData.feed_preferences && typeof prefsData.feed_preferences === 'object') {
+          // Cast the data from the database to our FeedPreferences type
           feedPreferences = {
             ...defaultFeedPrefs,
-            ...prefsData.feed_preferences
+            ...(prefsData.feed_preferences as unknown as FeedPreferences)
           };
         } else {
           feedPreferences = defaultFeedPrefs;
