@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
@@ -11,9 +10,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { Json } from "@/integrations/supabase/types";
 
-// Define the feed preferences type
+// Define the feed preferences interface that's compatible with Json type
 interface FeedPreferences {
+  [key: string]: boolean; // Add index signature to make it compatible with Json type
   twitter: boolean;
   discord: boolean;
   telegram: boolean;
