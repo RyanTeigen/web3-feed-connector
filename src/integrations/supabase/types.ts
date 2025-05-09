@@ -125,15 +125,114 @@ export type Database = {
         }
         Relationships: []
       }
+      user_interactions: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          interaction_type: string
+          metadata: Json | null
+          platform: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          interaction_type: string
+          metadata?: Json | null
+          platform: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          interaction_type?: string
+          metadata?: Json | null
+          platform?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          created_at: string
+          feed_preferences: Json
+          id: string
+          notification_enabled: boolean
+          theme: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feed_preferences?: Json
+          id?: string
+          notification_enabled?: boolean
+          theme?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feed_preferences?: Json
+          id?: string
+          notification_enabled?: boolean
+          theme?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallet_connections: {
+        Row: {
+          chain_id: number
+          created_at: string
+          id: string
+          last_connected_at: string
+          nonce: string
+          user_id: string
+          wallet_address: string
+          wallet_type: Database["public"]["Enums"]["wallet_type"]
+        }
+        Insert: {
+          chain_id: number
+          created_at?: string
+          id?: string
+          last_connected_at?: string
+          nonce: string
+          user_id: string
+          wallet_address: string
+          wallet_type: Database["public"]["Enums"]["wallet_type"]
+        }
+        Update: {
+          chain_id?: number
+          created_at?: string
+          id?: string
+          last_connected_at?: string
+          nonce?: string
+          user_id?: string
+          wallet_address?: string
+          wallet_type?: Database["public"]["Enums"]["wallet_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_nonce: {
+        Args: { user_id: string; wallet_address: string }
+        Returns: string
+      }
     }
     Enums: {
-      [_ in never]: never
+      wallet_type: "metamask" | "walletconnect" | "coinbase"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -248,6 +347,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      wallet_type: ["metamask", "walletconnect", "coinbase"],
+    },
   },
 } as const

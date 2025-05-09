@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { Wallet } from "lucide-react";
 
 const AuthPage = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +21,7 @@ const AuthPage = () => {
   const [showHelp, setShowHelp] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { connectWallet, isConnecting } = useWeb3Auth();
 
   // Get the current URL for redirect
   const getCurrentUrl = () => {
@@ -97,6 +101,21 @@ const AuthPage = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleWalletConnect = async (provider: 'metamask' | 'walletconnect' | 'coinbase') => {
+    try {
+      await connectWallet(provider);
+      // No need to navigate as the Web3AuthProvider will handle session updates
+      // and the protected route will automatically redirect
+    } catch (error: any) {
+      console.error("Wallet connection error:", error);
+      toast({
+        variant: "destructive",
+        title: "Wallet connection error",
+        description: error.message || "Failed to connect wallet"
+      });
     }
   };
 
@@ -187,6 +206,30 @@ const AuthPage = () => {
           </form>
         </Tabs>
         
+        <div className="relative my-6">
+          <Separator />
+          <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+            OR
+          </span>
+        </div>
+        
+        <div className="space-y-3">
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2"
+            onClick={() => handleWalletConnect('metamask')}
+            disabled={isConnecting}
+          >
+            {isConnecting ? (
+              <span className="animate-spin mr-1">⟳</span>
+            ) : (
+              <Wallet className="h-4 w-4" />
+            )}
+            {isConnecting ? "Connecting..." : "Connect with Web3 Wallet"}
+          </Button>
+        </div>
+        
         <p className="text-center mt-6 text-sm text-muted-foreground">
           {activeTab === "login" 
             ? "Don't have an account? " 
@@ -206,6 +249,30 @@ const AuthPage = () => {
             <h2 className="text-xl font-bold">Authentication Help</h2>
             
             <div className="space-y-2">
+              <h3 className="font-semibold">Authentication Options</h3>
+              <p className="text-sm">
+                Autheo supports multiple authentication methods:
+              </p>
+              <ul className="text-sm list-disc pl-5 space-y-2 mt-2">
+                <li>Traditional email and password</li>
+                <li>Web3 wallet connection (MetaMask, WalletConnect, Coinbase Wallet)</li>
+              </ul>
+            </div>
+            
+            <div className="space-y-2">
+              <h3 className="font-semibold">Using Web3 Authentication</h3>
+              <p className="text-sm">
+                When connecting with a Web3 wallet:
+              </p>
+              <ol className="text-sm list-decimal pl-5 space-y-2 mt-2">
+                <li>Click "Connect with Web3 Wallet"</li>
+                <li>Select your preferred wallet provider</li>
+                <li>Approve the connection request in your wallet</li>
+                <li>Sign the message to verify your ownership</li>
+              </ol>
+            </div>
+            
+            <div className="space-y-2 mt-4">
               <h3 className="font-semibold">Supabase URL Configuration</h3>
               <p className="text-sm">
                 If you're experiencing connection issues, make sure your Supabase project has the correct URL configuration:
@@ -231,7 +298,8 @@ const AuthPage = () => {
                 <li>Email verification might be required for new accounts</li>
                 <li>Check your email spam folder for verification emails</li>
                 <li>Password must be at least 6 characters long</li>
-                <li>Ensure your Supabase project has the correct authentication settings</li>
+                <li>Ensure your wallet is connected to the correct network</li>
+                <li>For MetaMask issues, try resetting your account in MetaMask settings</li>
               </ul>
             </div>
           </div>

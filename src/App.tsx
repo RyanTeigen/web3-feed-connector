@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { Web3AuthProvider } from "./context/Web3AuthContext";
 import { useAuth } from "./context/AuthContext";
 import Index from "./pages/Index";
 import FeedsPage from "./pages/FeedsPage";
@@ -82,19 +83,21 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <AuthProvider>
-        <ThemeProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-grow">
-                <AppRoutes />
-              </main>
-              <Footer />
-            </div>
-          </BrowserRouter>
-        </ThemeProvider>
+        <Web3AuthProvider>
+          <ThemeProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <div className="min-h-screen flex flex-col">
+                <Navbar />
+                <main className="flex-grow">
+                  <AppRoutes />
+                </main>
+                <Footer />
+              </div>
+            </BrowserRouter>
+          </ThemeProvider>
+        </Web3AuthProvider>
       </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>

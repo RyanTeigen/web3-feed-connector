@@ -12,6 +12,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ThemeToggle } from "./ThemeToggle";
+import { WalletConnect } from "./web3/WalletConnect";
+import { ProfileOnboarding } from "./web3/ProfileOnboarding";
 
 const Stars = () => {
   useEffect(() => {
@@ -98,6 +100,7 @@ const Navbar = () => {
                   About
                 </Link>
                 <ThemeToggle />
+                <WalletConnect />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -117,10 +120,7 @@ const Navbar = () => {
                     </div>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="cursor-pointer flex w-full items-center">
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
+                      <ProfileOnboarding />
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer flex items-center text-red-600 focus:text-red-600">
@@ -189,6 +189,12 @@ const Navbar = () => {
                     </AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium">{user?.email}</span>
+                </div>
+                <div className="mt-2 px-3 py-2">
+                  <WalletConnect />
+                </div>
+                <div className="mt-2">
+                  <ProfileOnboarding />
                 </div>
                 <Button 
                   className="w-full mt-2 text-red-600 hover:text-red-700" 

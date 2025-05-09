@@ -1,5 +1,5 @@
 
 project_id = "nooalqkkbkrrbsrqnaqg"
 
-[functions.fetch-social-feeds]
-verify_jwt = true
+[functions.web3-auth]
+verify_jwt = false
