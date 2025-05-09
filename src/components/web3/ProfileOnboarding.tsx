@@ -12,6 +12,15 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 
+// Define the feed preferences type
+interface FeedPreferences {
+  twitter: boolean;
+  discord: boolean;
+  telegram: boolean;
+  blog: boolean;
+  youtube: boolean;
+}
+
 export const ProfileOnboarding = () => {
   const { user } = useAuth();
   const { walletAddress } = useWeb3Auth();
@@ -31,7 +40,7 @@ export const ProfileOnboarding = () => {
       telegram: true,
       blog: true,
       youtube: true,
-    },
+    } as FeedPreferences,
   });
   const { toast } = useToast();
 
@@ -53,7 +62,7 @@ export const ProfileOnboarding = () => {
         ...preferences,
         feed_preferences: {
           ...preferences.feed_preferences,
-          [key]: !preferences.feed_preferences[key as keyof typeof preferences.feed_preferences],
+          [key]: !preferences.feed_preferences[key as keyof FeedPreferences],
         },
       });
     }
@@ -136,16 +145,30 @@ export const ProfileOnboarding = () => {
         .single();
         
       if (prefsData) {
+        const defaultFeedPrefs: FeedPreferences = {
+          twitter: true,
+          discord: true,
+          telegram: true,
+          blog: true,
+          youtube: true,
+        };
+        
+        // Ensure we have a properly structured feed_preferences object
+        let feedPreferences: FeedPreferences;
+        
+        if (prefsData.feed_preferences && typeof prefsData.feed_preferences === 'object') {
+          feedPreferences = {
+            ...defaultFeedPrefs,
+            ...prefsData.feed_preferences
+          };
+        } else {
+          feedPreferences = defaultFeedPrefs;
+        }
+        
         setPreferences({
           theme: prefsData.theme || "dark",
           notification_enabled: prefsData.notification_enabled,
-          feed_preferences: prefsData.feed_preferences || {
-            twitter: true,
-            discord: true,
-            telegram: true,
-            blog: true,
-            youtube: true,
-          },
+          feed_preferences: feedPreferences,
         });
       }
       

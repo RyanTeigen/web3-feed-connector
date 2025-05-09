@@ -48,59 +48,65 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const AppRoutes = () => (
-  <Routes>
-    <Route 
-      path="/" 
-      element={
-        <ProtectedRoute>
-          <Index />
-        </ProtectedRoute>
-      } 
-    />
-    <Route 
-      path="/feeds" 
-      element={
-        <ProtectedRoute>
-          <FeedsPage />
-        </ProtectedRoute>
-      } 
-    />
-    <Route path="/about" element={<AboutPage />} />
-    <Route 
-      path="/auth" 
-      element={
-        <PublicRoute>
-          <AuthPage />
-        </PublicRoute>
-      } 
-    />
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-);
+// Routes component to separate the routing logic
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route 
+        path="/" 
+        element={
+          <ProtectedRoute>
+            <Index />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/feeds" 
+        element={
+          <ProtectedRoute>
+            <FeedsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route path="/about" element={<AboutPage />} />
+      <Route 
+        path="/auth" 
+        element={
+          <PublicRoute>
+            <AuthPage />
+          </PublicRoute>
+        } 
+      />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Web3AuthProvider>
-          <ThemeProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <div className="min-h-screen flex flex-col">
-                <Navbar />
-                <main className="flex-grow">
-                  <AppRoutes />
-                </main>
-                <Footer />
-              </div>
-            </BrowserRouter>
-          </ThemeProvider>
-        </Web3AuthProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+// Main App component
+const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <Web3AuthProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <div className="min-h-screen flex flex-col">
+                  <Navbar />
+                  <main className="flex-grow">
+                    <AppRoutes />
+                  </main>
+                  <Footer />
+                </div>
+              </BrowserRouter>
+            </Web3AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

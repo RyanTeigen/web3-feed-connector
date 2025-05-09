@@ -6,7 +6,7 @@ import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { Loader2, Wallet, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-export const WalletConnect = () => {
+const WalletConnect = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { connectWallet, isConnecting, walletAddress, walletType, disconnectWallet } = useWeb3Auth();
@@ -126,3 +126,5 @@ export const WalletConnect = () => {
     </>
   );
 };
+
+export { WalletConnect };

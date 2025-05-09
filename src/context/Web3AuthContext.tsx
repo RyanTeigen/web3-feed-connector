@@ -64,7 +64,8 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
       
       // Get the provider based on the wallet type
       if (provider === 'metamask') {
-        if (window.ethereum) {
+        // Safely access window.ethereum with proper type checking
+        if (typeof window !== 'undefined' && window.ethereum) {
           ethereum = window.ethereum;
         } else {
           throw new Error('MetaMask is not installed. Please install MetaMask and try again.');
@@ -138,7 +139,7 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
         variant: "default",
       });
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error connecting wallet:', error);
       toast({
         title: "Connection Error",
