@@ -1,34 +1,39 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ethers } from 'ethers';
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
-import { useToast } from '@/components/ui/use-toast';
+import { useWalletConnection, WalletType } from '@/hooks/useWalletConnection';
+import { walletReducer, WalletState, WalletAction } from '@/reducers/walletReducer';
 
 interface IWeb3AuthContext {
   isConnecting: boolean;
-  connectWallet: (provider: 'metamask' | 'walletconnect' | 'coinbase') => Promise<void>;
+  connectWallet: (provider: WalletType) => Promise<void>;
   disconnectWallet: () => void;
   walletAddress: string | null;
-  walletType: 'metamask' | 'walletconnect' | 'coinbase' | null;
+  walletType: WalletType;
   chainId: number | null;
 }
+
+const initialState: WalletState = {
+  walletAddress: null,
+  walletType: null,
+  chainId: null,
+  loading: false
+};
 
 const Web3AuthContext = createContext<IWeb3AuthContext | undefined>(undefined);
 
 export function Web3AuthProvider({ children }: { children: ReactNode }) {
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
-  const [walletType, setWalletType] = useState<'metamask' | 'walletconnect' | 'coinbase' | null>(null);
-  const [chainId, setChainId] = useState<number | null>(null);
-  const { user, session } = useAuth();
-  const { toast } = useToast();
+  const [state, dispatch] = useReducer(walletReducer, initialState);
+  const { user } = useAuth();
+  const { isConnecting, connectWallet: connectWalletHook, disconnectWallet: disconnectWalletHook } = useWalletConnection();
 
   // Load saved wallet connection
   useEffect(() => {
     if (user) {
       const loadWalletConnection = async () => {
         try {
+          dispatch({ type: 'SET_LOADING', payload: true });
           const { data } = await supabase
             .from('wallet_connections')
             .select('*')
@@ -38,155 +43,59 @@ export function Web3AuthProvider({ children }: { children: ReactNode }) {
             .single();
             
           if (data) {
-            setWalletAddress(data.wallet_address);
-            setWalletType(data.wallet_type);
-            setChainId(data.chain_id);
+            dispatch({
+              type: 'SET_WALLET',
+              payload: {
+                address: data.wallet_address,
+                type: data.wallet_type,
+                chainId: data.chain_id
+              }
+            });
+          } else {
+            dispatch({ type: 'SET_LOADING', payload: false });
           }
         } catch (error) {
           console.error('Error loading wallet connection:', error);
+          dispatch({ type: 'SET_LOADING', payload: false });
         }
       };
       
       loadWalletConnection();
     } else {
       // Reset wallet state when user logs out
-      setWalletAddress(null);
-      setWalletType(null);
-      setChainId(null);
+      dispatch({ type: 'DISCONNECT_WALLET' });
     }
   }, [user]);
 
-  const connectWallet = async (provider: 'metamask' | 'walletconnect' | 'coinbase') => {
-    setIsConnecting(true);
+  const connectWalletContext = async (provider: WalletType) => {
+    const result = await connectWalletHook(provider);
     
-    try {
-      let ethereum: any;
-      
-      // Get the provider based on the wallet type
-      if (provider === 'metamask') {
-        // Safely access window.ethereum with proper type checking
-        if (typeof window !== 'undefined' && window.ethereum) {
-          ethereum = window.ethereum;
-        } else {
-          throw new Error('MetaMask is not installed. Please install MetaMask and try again.');
+    if (result.success && result.address && result.chainId && result.walletType) {
+      dispatch({
+        type: 'SET_WALLET',
+        payload: {
+          address: result.address,
+          type: result.walletType,
+          chainId: result.chainId
         }
-      } else if (provider === 'walletconnect' || provider === 'coinbase') {
-        toast({
-          title: "Coming Soon",
-          description: `${provider === 'walletconnect' ? 'WalletConnect' : 'Coinbase Wallet'} integration will be available soon.`,
-          variant: "default",
-        });
-        setIsConnecting(false);
-        return;
-      }
-      
-      // Request account access
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const address = accounts[0];
-      const chainIdHex = await ethereum.request({ method: 'eth_chainId' });
-      const chainIdDecimal = parseInt(chainIdHex, 16);
-      
-      // Get nonce from the server
-      const { data: nonceData } = await supabase.functions.invoke('web3-auth', {
-        body: {
-          action: 'getNonce',
-          address,
-          chain_id: chainIdDecimal,
-          wallet_type: provider
-        },
       });
-      
-      const { nonce, message } = nonceData;
-      
-      // Request signature
-      const signature = await ethereum.request({
-        method: 'personal_sign',
-        params: [message, address],
-      });
-      
-      // Verify signature
-      const { data: authData, error } = await supabase.functions.invoke('web3-auth', {
-        body: {
-          action: 'verifySignature',
-          address,
-          signature,
-          nonce,
-          message,
-          chain_id: chainIdDecimal,
-          wallet_type: provider
-        },
-      });
-      
-      if (error) {
-        throw error;
-      }
-      
-      // Set session with the returned tokens
-      const { access_token, refresh_token } = authData;
-      await supabase.auth.setSession({
-        access_token,
-        refresh_token
-      });
-      
-      // Update local state
-      setWalletAddress(address);
-      setWalletType(provider);
-      setChainId(chainIdDecimal);
-      
-      toast({
-        title: "Wallet Connected",
-        description: `Successfully connected with ${provider}`,
-        variant: "default",
-      });
-      
-    } catch (error: any) {
-      console.error('Error connecting wallet:', error);
-      toast({
-        title: "Connection Error",
-        description: error.message || "Failed to connect wallet. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsConnecting(false);
     }
   };
   
-  const disconnectWallet = async () => {
-    try {
-      if (user && walletAddress) {
-        // Optional: Update the database to mark the wallet as disconnected
-        // For now we just clear the local state
-      }
-      
-      setWalletAddress(null);
-      setWalletType(null);
-      setChainId(null);
-      
-      toast({
-        title: "Wallet Disconnected",
-        description: "Your wallet has been disconnected.",
-        variant: "default",
-      });
-      
-    } catch (error) {
-      console.error('Error disconnecting wallet:', error);
-      toast({
-        title: "Error",
-        description: "Failed to disconnect wallet.",
-        variant: "destructive",
-      });
-    }
+  const disconnectWalletContext = async () => {
+    await disconnectWalletHook();
+    dispatch({ type: 'DISCONNECT_WALLET' });
   };
 
   return (
     <Web3AuthContext.Provider
       value={{
         isConnecting,
-        connectWallet,
-        disconnectWallet,
-        walletAddress,
-        walletType,
-        chainId,
+        connectWallet: connectWalletContext,
+        disconnectWallet: disconnectWalletContext,
+        walletAddress: state.walletAddress,
+        walletType: state.walletType,
+        chainId: state.chainId,
       }}
     >
       {children}
