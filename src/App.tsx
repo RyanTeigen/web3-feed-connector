@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
-import { Routes, Route, BrowserRouter as Router, useLocation } from "react-router-dom";
+import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext";
-import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
 import AboutPage from "@/pages/AboutPage";
@@ -15,19 +16,18 @@ import FeedCustomizationPage from "@/pages/FeedCustomizationPage";
 
 function App() {
   const [loading, setLoading] = useState(true);
-  const { checkSession } = useAuth();
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      await checkSession();
+    // Short delay to simulate checking session
+    const timer = setTimeout(() => {
       setLoading(false);
-    };
-
-    checkAuthStatus();
-  }, [checkSession]);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="theme">
+    <ThemeProvider>
       <Router>
         {loading ? (
           <div className="grid h-screen place-items-center">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { X, Plus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -13,8 +12,14 @@ interface KeywordFiltersProps {
   onSave: () => void;
 }
 
+// Define type for keyword filters
+interface KeywordFilters {
+  mutedKeywords: string[];
+  highlightKeywords: string[];
+}
+
 // Default keyword filters
-const DEFAULT_FILTERS = {
+const DEFAULT_FILTERS: KeywordFilters = {
   mutedKeywords: [],
   highlightKeywords: [],
 };
@@ -22,7 +27,7 @@ const DEFAULT_FILTERS = {
 const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [filters, setFilters] = useState(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<KeywordFilters>(DEFAULT_FILTERS);
   const [newMutedKeyword, setNewMutedKeyword] = useState("");
   const [newHighlightKeyword, setNewHighlightKeyword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,14 +38,16 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
       const fetchFilters = async () => {
         try {
           const { data, error } = await supabase
-            .from("user_feed_preferences")
-            .select("keyword_filters")
-            .eq("user_id", user.id)
+            .from('user_preferences')
+            .select('settings')
+            .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
-          if (data?.keyword_filters) {
-            setFilters(data.keyword_filters);
+          
+          // If we have keyword filters data, set it
+          if (data?.settings?.keyword_filters) {
+            setFilters(data.settings.keyword_filters);
           }
         } catch (error) {
           console.error("Error fetching keyword filters:", error);
@@ -109,11 +116,14 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
 
     setLoading(true);
     try {
+      // Using the existing user_preferences table
       const { error } = await supabase
-        .from("user_feed_preferences")
+        .from('user_preferences')
         .upsert({
           user_id: user.id,
-          keyword_filters: filters,
+          settings: {
+            keyword_filters: filters
+          },
           updated_at: new Date().toISOString(),
         });
 

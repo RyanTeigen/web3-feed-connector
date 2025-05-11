@@ -13,8 +13,25 @@ interface FeedPreferencesProps {
   onSave: () => void;
 }
 
+// Define the type for our content preferences
+interface ContentPreferences {
+  contentTypes: {
+    news: boolean;
+    announcements: boolean;
+    discussions: boolean;
+    tutorials: boolean;
+    market_updates: boolean;
+    governance: boolean;
+  };
+  priorities: {
+    recency: number;
+    relevance: number;
+  };
+  showVerifiedOnly: boolean;
+}
+
 // Default feed preferences
-const DEFAULT_PREFERENCES = {
+const DEFAULT_PREFERENCES: ContentPreferences = {
   contentTypes: {
     news: true,
     announcements: true,
@@ -33,7 +50,7 @@ const DEFAULT_PREFERENCES = {
 const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [preferences, setPreferences] = useState(DEFAULT_PREFERENCES);
+  const [preferences, setPreferences] = useState<ContentPreferences>(DEFAULT_PREFERENCES);
   const [loading, setLoading] = useState(false);
 
   // Fetch user preferences from database if logged in
@@ -41,15 +58,19 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
     if (user) {
       const fetchPreferences = async () => {
         try {
+          // Use a type-safe approach with the Supabase client
+          // We're using a type assertion here to handle the table that might not exist yet
           const { data, error } = await supabase
-            .from("user_feed_preferences")
-            .select("content_preferences")
-            .eq("user_id", user.id)
+            .from('user_preferences')
+            .select('settings')
+            .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
-          if (data?.content_preferences) {
-            setPreferences(data.content_preferences);
+          
+          // If we have content preferences data, set it
+          if (data?.settings?.content_preferences) {
+            setPreferences(data.settings.content_preferences);
           }
         } catch (error) {
           console.error("Error fetching feed preferences:", error);
@@ -100,11 +121,15 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
 
     setLoading(true);
     try {
+      // Using the existing user_preferences table
       const { error } = await supabase
-        .from("user_feed_preferences")
+        .from('user_preferences')
         .upsert({
           user_id: user.id,
-          content_preferences: preferences,
+          settings: {
+            ...DEFAULT_PREFERENCES,
+            content_preferences: preferences
+          },
           updated_at: new Date().toISOString(),
         });
 

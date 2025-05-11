@@ -12,8 +12,18 @@ interface UpdateSettingsProps {
   onSave: () => void;
 }
 
+// Define type for update settings
+interface UpdateSettings {
+  updateFrequency: "realtime" | "hourly" | "daily" | "manual";
+  autoRefresh: boolean;
+  notifications: {
+    browser: boolean;
+    email: boolean;
+  };
+}
+
 // Default update settings
-const DEFAULT_SETTINGS = {
+const DEFAULT_SETTINGS: UpdateSettings = {
   updateFrequency: "realtime",
   autoRefresh: true,
   notifications: {
@@ -25,7 +35,7 @@ const DEFAULT_SETTINGS = {
 const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<UpdateSettings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(false);
 
   // Fetch user update settings from database if logged in
@@ -34,14 +44,16 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
       const fetchSettings = async () => {
         try {
           const { data, error } = await supabase
-            .from("user_feed_preferences")
-            .select("update_settings")
-            .eq("user_id", user.id)
+            .from('user_preferences')
+            .select('settings')
+            .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
-          if (data?.update_settings) {
-            setSettings(data.update_settings);
+          
+          // If we have update settings data, set it
+          if (data?.settings?.update_settings) {
+            setSettings(data.settings.update_settings);
           }
         } catch (error) {
           console.error("Error fetching update settings:", error);
@@ -52,7 +64,7 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
     }
   }, [user]);
 
-  const handleFrequencyChange = (value: string) => {
+  const handleFrequencyChange = (value: "realtime" | "hourly" | "daily" | "manual") => {
     setSettings((prev) => ({
       ...prev,
       updateFrequency: value,
@@ -88,11 +100,14 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
 
     setLoading(true);
     try {
+      // Using the existing user_preferences table
       const { error } = await supabase
-        .from("user_feed_preferences")
+        .from('user_preferences')
         .upsert({
           user_id: user.id,
-          update_settings: settings,
+          settings: {
+            update_settings: settings
+          },
           updated_at: new Date().toISOString(),
         });
 
@@ -127,7 +142,7 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
         
         <RadioGroup 
           value={settings.updateFrequency} 
-          onValueChange={handleFrequencyChange}
+          onValueChange={(value) => handleFrequencyChange(value as any)}
           className="space-y-3"
         >
           <div className="flex items-start space-x-2">
