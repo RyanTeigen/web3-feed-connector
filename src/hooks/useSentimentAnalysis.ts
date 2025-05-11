@@ -56,7 +56,25 @@ export const useSentimentAnalysis = (platform: PlatformType = 'discord', timefra
       const { data, error } = await query;
       
       if (error) throw error;
-      return data as SentimentAnalysisRecord[];
+      
+      // Transform the data to match the expected type structure
+      return (data || []).map(record => ({
+        id: record.id,
+        platform: record.platform,
+        channel_name: record.channel_name,
+        analyzed_at: record.analyzed_at,
+        sentiment_summary: record.sentiment_summary as unknown as {
+          positive: number;
+          neutral: number;
+          negative: number;
+        },
+        topics: record.topics as unknown as {
+          main_topics: string[];
+          trending: string[];
+        },
+        message_count: record.message_count,
+        period: record.period
+      })) as SentimentAnalysisRecord[];
     },
   });
 
@@ -76,7 +94,11 @@ export const useSentimentAnalysis = (platform: PlatformType = 'discord', timefra
         .in('analysis_id', analysisRecords.map(r => r.id));
         
       if (error) throw error;
-      return data as SentimentDetailRecord[];
+      
+      return (data || []).map(record => ({
+        ...record,
+        keywords: record.keywords as string[]
+      })) as SentimentDetailRecord[];
     },
     enabled: !!analysisRecords && analysisRecords.length > 0,
   });

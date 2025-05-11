@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { WalletConnect } from "@/components/web3/WalletConnect";
 import {
   Menu,
@@ -20,9 +20,9 @@ import {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, signOut } = useAuth();
   const { walletAddress } = useWeb3Auth();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
@@ -65,7 +65,7 @@ const Navbar = () => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={logout}
+                  onClick={signOut}
                   className="flex items-center gap-2"
                 >
                   <LogOut size={16} />
@@ -150,7 +150,7 @@ const Navbar = () => {
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      logout();
+                      signOut();
                       closeMenu();
                     }}
                     className="flex items-center w-full gap-2 justify-start"

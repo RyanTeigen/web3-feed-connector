@@ -11,7 +11,7 @@ import {
   ToggleGroup,
   ToggleGroupItem
 } from '@/components/ui/toggle-group';
-import { Discord, Twitter, Linkedin, Globe, BarChart3, PieChart, LineChart, ListFilter } from 'lucide-react';
+import { MessageSquare, Globe, BarChart3, PieChart, LineChart, ListFilter } from 'lucide-react';
 
 interface SentimentFiltersProps {
   platform: PlatformType;
@@ -37,13 +37,13 @@ export const SentimentFilters = ({
           <span className="text-sm font-medium">Platform:</span>
           <ToggleGroup type="single" value={platform} onValueChange={(value) => value && onPlatformChange(value as PlatformType)}>
             <ToggleGroupItem value="discord" aria-label="Discord">
-              <Discord className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4" />
             </ToggleGroupItem>
             <ToggleGroupItem value="twitter" aria-label="Twitter">
-              <Twitter className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4" />
             </ToggleGroupItem>
             <ToggleGroupItem value="linkedin" aria-label="LinkedIn">
-              <Linkedin className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4" />
             </ToggleGroupItem>
             <ToggleGroupItem value="all" aria-label="All platforms">
               <Globe className="h-4 w-4" />
