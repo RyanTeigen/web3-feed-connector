@@ -1,5 +1,8 @@
 
 project_id = "nooalqkkbkrrbsrqnaqg"
 
+[functions.analyze-sentiment]
+verify_jwt = false
+
 [functions.web3-auth]
 verify_jwt = false

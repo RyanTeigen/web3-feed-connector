@@ -15,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { ThemeProvider } from "./context/ThemeContext";
+import SentimentDashboard from "./pages/SentimentDashboard";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +66,14 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <FeedsPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/sentiment" 
+        element={
+          <ProtectedRoute>
+            <SentimentDashboard />
           </ProtectedRoute>
         } 
       />

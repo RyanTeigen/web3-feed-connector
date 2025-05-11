@@ -9,6 +9,44 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      feature_requests: {
+        Row: {
+          analysis_id: string
+          description: string
+          feature_name: string
+          first_mentioned: string
+          id: string
+          mention_count: number
+          status: string | null
+        }
+        Insert: {
+          analysis_id: string
+          description: string
+          feature_name: string
+          first_mentioned: string
+          id?: string
+          mention_count: number
+          status?: string | null
+        }
+        Update: {
+          analysis_id?: string
+          description?: string
+          feature_name?: string
+          first_mentioned?: string
+          id?: string
+          mention_count?: number
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "feature_requests_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "sentiment_analysis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -33,6 +71,136 @@ export type Database = {
           id?: string
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      sentiment_analysis: {
+        Row: {
+          analyzed_at: string
+          channel_name: string
+          id: string
+          message_count: number
+          period: string
+          platform: string
+          sentiment_summary: Json
+          topics: Json
+        }
+        Insert: {
+          analyzed_at?: string
+          channel_name: string
+          id?: string
+          message_count: number
+          period: string
+          platform: string
+          sentiment_summary: Json
+          topics: Json
+        }
+        Update: {
+          analyzed_at?: string
+          channel_name?: string
+          id?: string
+          message_count?: number
+          period?: string
+          platform?: string
+          sentiment_summary?: Json
+          topics?: Json
+        }
+        Relationships: []
+      }
+      sentiment_details: {
+        Row: {
+          analysis_id: string
+          emotion_type: string
+          id: string
+          keywords: Json
+          percentage: number
+        }
+        Insert: {
+          analysis_id: string
+          emotion_type: string
+          id?: string
+          keywords: Json
+          percentage: number
+        }
+        Update: {
+          analysis_id?: string
+          emotion_type?: string
+          id?: string
+          keywords?: Json
+          percentage?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sentiment_details_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "sentiment_analysis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sentiment_insights: {
+        Row: {
+          analysis_id: string
+          confidence_score: number
+          created_at: string
+          description: string
+          id: string
+          insight_type: string
+        }
+        Insert: {
+          analysis_id: string
+          confidence_score: number
+          created_at?: string
+          description: string
+          id?: string
+          insight_type: string
+        }
+        Update: {
+          analysis_id?: string
+          confidence_score?: number
+          created_at?: string
+          description?: string
+          id?: string
+          insight_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sentiment_insights_analysis_id_fkey"
+            columns: ["analysis_id"]
+            isOneToOne: false
+            referencedRelation: "sentiment_analysis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sentiment_notification_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          id: string
+          notification_threshold: number
+          platforms: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notification_threshold?: number
+          platforms?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          notification_threshold?: number
+          platforms?: Json
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

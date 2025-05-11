@@ -1,233 +1,174 @@
 
-import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeToggle } from "./ThemeToggle";
-import { WalletConnect } from "./web3/WalletConnect";
-import { ProfileOnboarding } from "./web3/ProfileOnboarding";
-
-const Stars = () => {
-  useEffect(() => {
-    const container = document.querySelector('.stars-container');
-    if (!container) return;
-
-    const starCount = 50;
-    for (let i = 0; i < starCount; i++) {
-      const star = document.createElement('div');
-      star.classList.add('star');
-      
-      const size = Math.random() * 3 + 1;
-      star.style.width = `${size}px`;
-      star.style.height = `${size}px`;
-      
-      star.style.top = `${Math.random() * 100}%`;
-      star.style.left = `${Math.random() * 100}%`;
-      
-      const duration = Math.random() * 60 + 30;
-      star.style.animationDuration = `${duration}s, ${Math.random() * 3 + 2}s`;
-      
-      const delay = Math.random() * 30;
-      star.style.animationDelay = `${delay}s, ${Math.random() * 2}s`;
-      
-      container.appendChild(star);
-    }
-
-    return () => {
-      if (container) {
-        while (container.firstChild) {
-          container.removeChild(container.firstChild);
-        }
-      }
-    };
-  }, []);
-
-  return <div className="stars-container" />;
-};
+import { useWeb3Auth } from "@/context/Web3AuthContext";
+import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { useMediaQuery } from "@/hooks/use-mobile";
+import { WalletConnect } from "@/components/web3/WalletConnect";
+import {
+  Menu,
+  X,
+  User,
+  LogOut,
+  BookOpen,
+  Home,
+  MessageSquare,
+  BarChart
+} from "lucide-react";
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut, isAuthenticated } = useAuth();
-  const navigate = useNavigate();
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/auth");
-  };
-
-  const getInitials = () => {
-    if (!user?.email) return "AU";
-    return user.email.substring(0, 2).toUpperCase();
-  };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const { walletAddress } = useWeb3Auth();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <nav className="sticky top-0 z-50 w-full backdrop-blur-lg border-b border-border/40 bg-background/80">
-      <Stars />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <nav className="border-b bg-background">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <img 
-                src="/lovable-uploads/b6c63bd0-85fc-4221-b7f4-f2a40f8901d5.png" 
-                alt="Autheo Logo" 
-                className="h-10 w-auto"
-              />
+            <Link to="/" className="flex items-center" onClick={closeMenu}>
+              <span className="text-2xl font-bold text-primary">Autheo</span>
             </Link>
           </div>
-          
-          <div className="hidden md:flex items-center space-x-4">
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
             {isAuthenticated ? (
               <>
-                <Link to="/" className="px-3 py-2 text-sm font-medium hover:text-secondary transition-colors">
+                <Link to="/" className="text-muted-foreground hover:text-foreground">
                   Home
                 </Link>
-                <Link to="/feeds" className="px-3 py-2 text-sm font-medium hover:text-secondary transition-colors">
-                  Feeds
+                <Link to="/feeds" className="text-muted-foreground hover:text-foreground">
+                  Social Feeds
                 </Link>
-                <Link to="/about" className="px-3 py-2 text-sm font-medium hover:text-secondary transition-colors">
-                  About
+                <Link to="/sentiment" className="text-muted-foreground hover:text-foreground">
+                  Sentiment
                 </Link>
-                <ThemeToggle />
-                <WalletConnect />
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                      <Avatar>
-                        <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                        <AvatarFallback className="bg-web3-vibrant-teal/20 text-web3-vibrant-teal">
-                          {getInitials()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{user?.email}</p>
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <ProfileOnboarding />
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer flex items-center text-red-600 focus:text-red-600">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </>
-            ) : (
+            ) : null}
+            <Link to="/about" className="text-muted-foreground hover:text-foreground">
+              About
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
+            {isAuthenticated ? (
               <>
-                <Link to="/about" className="px-3 py-2 text-sm font-medium hover:text-secondary transition-colors">
-                  About
-                </Link>
-                <ThemeToggle />
-                <Button onClick={() => navigate("/auth")} className="web3-button text-web3-electric-blue">
-                  Login
+                {!walletAddress && <WalletConnect />}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={logout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut size={16} />
+                  <span>Logout</span>
                 </Button>
               </>
+            ) : (
+              <Link to="/auth">
+                <Button size="sm" className="flex items-center gap-2">
+                  <User size={16} />
+                  <span>Sign In</span>
+                </Button>
+              </Link>
             )}
           </div>
-          
-          <div className="md:hidden flex items-center gap-2">
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center gap-4">
             <ThemeToggle />
             <button
-              onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-muted hover:text-secondary focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center rounded-md text-foreground"
+              aria-expanded="false"
             >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <X className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="block h-6 w-6" aria-hidden="true" />
+              )}
             </button>
           </div>
         </div>
       </div>
 
-      {isMobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2">
+      {/* Mobile Menu */}
+      {isMobile && isMenuOpen && (
+        <div className="md:hidden bg-background border-t">
+          <div className="container px-4 pt-2 pb-3 space-y-2">
             {isAuthenticated ? (
               <>
                 <Link
                   to="/"
-                  className="block px-3 py-2 text-base font-medium hover:text-secondary"
-                  onClick={toggleMobileMenu}
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
                 >
-                  Home
+                  <Home size={16} />
+                  <span>Home</span>
                 </Link>
                 <Link
                   to="/feeds"
-                  className="block px-3 py-2 text-base font-medium hover:text-secondary"
-                  onClick={toggleMobileMenu}
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
                 >
-                  Feeds
+                  <MessageSquare size={16} />
+                  <span>Social Feeds</span>
                 </Link>
                 <Link
-                  to="/about"
-                  className="block px-3 py-2 text-base font-medium hover:text-secondary"
-                  onClick={toggleMobileMenu}
+                  to="/sentiment"
+                  onClick={closeMenu}
+                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
                 >
-                  About
+                  <BarChart size={16} />
+                  <span>Sentiment</span>
                 </Link>
-                <div className="flex items-center px-3 py-2">
-                  <Avatar className="h-9 w-9 mr-2">
-                    <AvatarImage src={user?.user_metadata?.avatar_url || ""} />
-                    <AvatarFallback className="bg-web3-vibrant-teal/20 text-web3-vibrant-teal">
-                      {getInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="text-sm font-medium">{user?.email}</span>
+              </>
+            ) : null}
+            <Link
+              to="/about"
+              onClick={closeMenu}
+              className="flex items-center gap-2 text-foreground hover:text-primary py-2"
+            >
+              <BookOpen size={16} />
+              <span>About</span>
+            </Link>
+            
+            {isAuthenticated ? (
+              <>
+                {!walletAddress && <WalletConnect />}
+                <div className="pt-4 pb-3 border-t">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      logout();
+                      closeMenu();
+                    }}
+                    className="flex items-center w-full gap-2 justify-start"
+                  >
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </Button>
                 </div>
-                <div className="mt-2 px-3 py-2">
-                  <WalletConnect />
-                </div>
-                <div className="mt-2">
-                  <ProfileOnboarding />
-                </div>
-                <Button 
-                  className="w-full mt-2 text-red-600 hover:text-red-700" 
-                  variant="ghost"
-                  onClick={() => {
-                    handleSignOut();
-                    toggleMobileMenu();
-                  }}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Log out
-                </Button>
               </>
             ) : (
-              <>
-                <Link
-                  to="/about"
-                  className="block px-3 py-2 text-base font-medium hover:text-secondary"
-                  onClick={toggleMobileMenu}
-                >
-                  About
+              <div className="pt-4 pb-3 border-t">
+                <Link to="/auth" onClick={closeMenu} className="w-full block">
+                  <Button size="sm" className="flex items-center w-full gap-2 justify-center">
+                    <User size={16} />
+                    <span>Sign In</span>
+                  </Button>
                 </Link>
-                <Button 
-                  className="web3-button w-full mt-4 text-web3-electric-blue"
-                  onClick={() => {
-                    navigate("/auth");
-                    toggleMobileMenu();
-                  }}
-                >
-                  Login
-                </Button>
-              </>
+              </div>
             )}
           </div>
         </div>
