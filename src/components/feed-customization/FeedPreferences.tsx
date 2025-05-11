@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Json } from "@/integrations/supabase/types";
 
 interface FeedPreferencesProps {
   onSave: () => void;
@@ -75,7 +76,8 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
           
           // If we have content preferences data, set it
           if (data?.feed_preferences) {
-            const feedPrefs = data.feed_preferences as FeedPreferencesData;
+            // Cast the JSON data to our expected format
+            const feedPrefs = data.feed_preferences as unknown as FeedPreferencesData;
             if (feedPrefs.content_preferences) {
               setPreferences(feedPrefs.content_preferences);
             }
@@ -137,7 +139,7 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
         .single();
         
       // Prepare the updated feed preferences
-      const currentFeedPrefs = (currentPreferences?.feed_preferences || {}) as FeedPreferencesData;
+      const currentFeedPrefs = (currentPreferences?.feed_preferences || {}) as unknown as FeedPreferencesData;
       
       const updatedFeedPreferences = {
         ...currentFeedPrefs,
@@ -149,7 +151,7 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          feed_preferences: updatedFeedPreferences,
+          feed_preferences: updatedFeedPreferences as unknown as Json,
           updated_at: new Date().toISOString(),
         });
 

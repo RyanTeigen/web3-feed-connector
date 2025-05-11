@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
+import { Json } from "@/integrations/supabase/types";
 
 interface UpdateSettingsProps {
   onSave: () => void;
@@ -19,6 +21,12 @@ interface UpdateSettings {
     browser: boolean;
     email: boolean;
   };
+}
+
+// Type for feed preferences from the database
+interface FeedPreferencesData {
+  update_settings?: UpdateSettings;
+  [key: string]: any;
 }
 
 // Default update settings
@@ -51,8 +59,11 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
           if (error) throw error;
           
           // If we have update settings data, set it
-          if (data?.feed_preferences?.update_settings) {
-            setSettings(data.feed_preferences.update_settings);
+          if (data?.feed_preferences) {
+            const feedPrefs = data.feed_preferences as unknown as FeedPreferencesData;
+            if (feedPrefs.update_settings) {
+              setSettings(feedPrefs.update_settings);
+            }
           }
         } catch (error) {
           console.error("Error fetching update settings:", error);
@@ -107,8 +118,10 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
         .single();
         
       // Prepare the updated feed preferences
+      const currentFeedPrefs = (currentPreferences?.feed_preferences || {}) as unknown as FeedPreferencesData;
+      
       const updatedFeedPreferences = {
-        ...currentPreferences?.feed_preferences,
+        ...currentFeedPrefs,
         update_settings: settings
       };
       
@@ -117,7 +130,7 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          feed_preferences: updatedFeedPreferences,
+          feed_preferences: updatedFeedPreferences as unknown as Json,
           updated_at: new Date().toISOString(),
         });
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Json } from "@/integrations/supabase/types";
 
 interface KeywordFiltersProps {
   onSave: () => void;
@@ -16,6 +17,12 @@ interface KeywordFiltersProps {
 interface KeywordFilters {
   mutedKeywords: string[];
   highlightKeywords: string[];
+}
+
+// Type for feed preferences from the database
+interface FeedPreferencesData {
+  keyword_filters?: KeywordFilters;
+  [key: string]: any;
 }
 
 // Default keyword filters
@@ -46,8 +53,11 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
           if (error) throw error;
           
           // If we have keyword filters data, set it
-          if (data?.feed_preferences?.keyword_filters) {
-            setFilters(data.feed_preferences.keyword_filters);
+          if (data?.feed_preferences) {
+            const feedPrefs = data.feed_preferences as unknown as FeedPreferencesData;
+            if (feedPrefs.keyword_filters) {
+              setFilters(feedPrefs.keyword_filters);
+            }
           }
         } catch (error) {
           console.error("Error fetching keyword filters:", error);
@@ -124,8 +134,10 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
         .single();
         
       // Prepare the updated feed preferences
+      const currentFeedPrefs = (currentPreferences?.feed_preferences || {}) as unknown as FeedPreferencesData;
+      
       const updatedFeedPreferences = {
-        ...currentPreferences?.feed_preferences,
+        ...currentFeedPrefs,
         keyword_filters: filters
       };
       
@@ -134,7 +146,7 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          feed_preferences: updatedFeedPreferences,
+          feed_preferences: updatedFeedPreferences as unknown as Json,
           updated_at: new Date().toISOString(),
         });
 
