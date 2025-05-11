@@ -1,121 +1,57 @@
-
+import { useState, useEffect } from "react";
+import { Routes, Route, BrowserRouter as Router, useLocation } from "react-router-dom";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import { Web3AuthProvider } from "./context/Web3AuthContext";
-import { useAuth } from "./context/AuthContext";
-import Index from "./pages/Index";
-import FeedsPage from "./pages/FeedsPage";
-import AboutPage from "./pages/AboutPage";
-import AuthPage from "./pages/AuthPage";
-import NotFound from "./pages/NotFound";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
-import { ThemeProvider } from "./context/ThemeContext";
-import SentimentDashboard from "./pages/SentimentDashboard";
+import Index from "@/pages/Index";
+import AboutPage from "@/pages/AboutPage";
+import FeedsPage from "@/pages/FeedsPage";
+import SentimentDashboard from "@/pages/SentimentDashboard";
+import AuthPage from "@/pages/AuthPage";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import NotFound from "@/pages/NotFound";
+import FeedCustomizationPage from "@/pages/FeedCustomizationPage";
 
-const queryClient = new QueryClient();
+function App() {
+  const [loading, setLoading] = useState(true);
+  const { checkSession } = useAuth();
 
-// Protected route component
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-  
-  return <>{children}</>;
-};
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      await checkSession();
+      setLoading(false);
+    };
 
-// Public route that redirects if user is already logged in
-const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-  
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-  
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return <>{children}</>;
-};
+    checkAuthStatus();
+  }, [checkSession]);
 
-// Routes component to separate the routing logic
-const AppRoutes = () => {
   return (
-    <Routes>
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute>
-            <Index />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/feeds" 
-        element={
-          <ProtectedRoute>
-            <FeedsPage />
-          </ProtectedRoute>
-        } 
-      />
-      <Route 
-        path="/sentiment" 
-        element={
-          <ProtectedRoute>
-            <SentimentDashboard />
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="/about" element={<AboutPage />} />
-      <Route 
-        path="/auth" 
-        element={
-          <PublicRoute>
-            <AuthPage />
-          </PublicRoute>
-        } 
-      />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <ThemeProvider defaultTheme="dark" storageKey="theme">
+      <Router>
+        {loading ? (
+          <div className="grid h-screen place-items-center">
+            <span className="loader"></span>
+          </div>
+        ) : (
+          <>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/feeds" element={<FeedsPage />} />
+              <Route path="/feed-customization" element={<FeedCustomizationPage />} />
+              <Route path="/sentiment" element={<SentimentDashboard />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Footer />
+            <Toaster />
+          </>
+        )}
+      </Router>
+    </ThemeProvider>
   );
-};
-
-// Main App component
-const App = () => {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <ThemeProvider>
-          <AuthProvider>
-            <Web3AuthProvider>
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <div className="min-h-screen flex flex-col">
-                  <Navbar />
-                  <main className="flex-grow">
-                    <AppRoutes />
-                  </main>
-                  <Footer />
-                </div>
-              </BrowserRouter>
-            </Web3AuthProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
-  );
-};
+}
 
 export default App;

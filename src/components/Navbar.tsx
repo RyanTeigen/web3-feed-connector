@@ -1,179 +1,132 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { useWeb3Auth } from "@/context/Web3AuthContext";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { WalletConnect } from "@/components/web3/WalletConnect";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Menu,
-  X,
-  User,
-  LogOut,
-  BookOpen,
-  Home,
-  MessageSquare,
-  BarChart
-} from "lucide-react";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ModeToggle } from "./ModeToggle";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Navbar = () => {
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, signOut } = useAuth();
-  const { walletAddress } = useWeb3Auth();
-  const isMobile = useIsMobile();
-  
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-  const closeMenu = () => setIsMenuOpen(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+      navigate("/auth");
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        description: "There was an error signing you out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
-    <nav className="border-b bg-background">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center" onClick={closeMenu}>
-              <span className="text-2xl font-bold text-primary">Autheo</span>
-            </Link>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            {isAuthenticated ? (
-              <>
-                <Link to="/" className="text-muted-foreground hover:text-foreground">
-                  Home
-                </Link>
-                <Link to="/feeds" className="text-muted-foreground hover:text-foreground">
-                  Social Feeds
-                </Link>
-                <Link to="/sentiment" className="text-muted-foreground hover:text-foreground">
-                  Sentiment
-                </Link>
-              </>
-            ) : null}
-            <Link to="/about" className="text-muted-foreground hover:text-foreground">
-              About
-            </Link>
-          </div>
-
-          <div className="hidden md:flex items-center gap-4">
-            <ThemeToggle />
-            {isAuthenticated ? (
-              <>
-                {!walletAddress && <WalletConnect />}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={signOut}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </Button>
-              </>
-            ) : (
-              <Link to="/auth">
-                <Button size="sm" className="flex items-center gap-2">
-                  <User size={16} />
-                  <span>Sign In</span>
-                </Button>
-              </Link>
-            )}
-          </div>
-
-          {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center gap-4">
-            <ThemeToggle />
-            <button
-              onClick={toggleMenu}
-              className="inline-flex items-center justify-center rounded-md text-foreground"
-              aria-expanded="false"
-            >
-              <span className="sr-only">Open main menu</span>
-              {isMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="container flex h-16 items-center justify-between">
+        <Link to="/" className="flex items-center space-x-2">
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="/logo.png" alt="Autheo Logo" />
+            <AvatarFallback>A</AvatarFallback>
+          </Avatar>
+          <span className="hidden font-bold sm:inline-block">Autheo</span>
+        </Link>
+        
+        <div className="hidden md:flex md:gap-x-6 items-center">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              `text-muted-foreground hover:text-foreground transition-colors ${isActive ? "text-foreground" : ""}`
+            }
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/feeds"
+            className={({ isActive }) =>
+              `text-muted-foreground hover:text-foreground transition-colors ${isActive ? "text-foreground" : ""}`
+            }
+          >
+            Feeds
+          </NavLink>
+          <NavLink
+            to="/feed-customization"
+            className={({ isActive }) =>
+              `text-muted-foreground hover:text-foreground transition-colors ${isActive ? "text-foreground" : ""}`
+            }
+          >
+            Customize
+          </NavLink>
+          <NavLink
+            to="/sentiment"
+            className={({ isActive }) =>
+              `text-muted-foreground hover:text-foreground transition-colors ${isActive ? "text-foreground" : ""}`
+            }
+          >
+            Sentiment
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              `text-muted-foreground hover:text-foreground transition-colors ${isActive ? "text-foreground" : ""}`
+            }
+          >
+            About
+          </NavLink>
         </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMobile && isMenuOpen && (
-        <div className="md:hidden bg-background border-t">
-          <div className="container px-4 pt-2 pb-3 space-y-2">
-            {isAuthenticated ? (
-              <>
-                <Link
-                  to="/"
-                  onClick={closeMenu}
-                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
-                >
-                  <Home size={16} />
-                  <span>Home</span>
-                </Link>
-                <Link
-                  to="/feeds"
-                  onClick={closeMenu}
-                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
-                >
-                  <MessageSquare size={16} />
-                  <span>Social Feeds</span>
-                </Link>
-                <Link
-                  to="/sentiment"
-                  onClick={closeMenu}
-                  className="flex items-center gap-2 text-foreground hover:text-primary py-2"
-                >
-                  <BarChart size={16} />
-                  <span>Sentiment</span>
-                </Link>
-              </>
-            ) : null}
-            <Link
-              to="/about"
-              onClick={closeMenu}
-              className="flex items-center gap-2 text-foreground hover:text-primary py-2"
-            >
-              <BookOpen size={16} />
-              <span>About</span>
-            </Link>
-            
-            {isAuthenticated ? (
-              <>
-                {!walletAddress && <WalletConnect />}
-                <div className="pt-4 pb-3 border-t">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      signOut();
-                      closeMenu();
-                    }}
-                    className="flex items-center w-full gap-2 justify-start"
-                  >
-                    <LogOut size={16} />
-                    <span>Logout</span>
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <div className="pt-4 pb-3 border-t">
-                <Link to="/auth" onClick={closeMenu} className="w-full block">
-                  <Button size="sm" className="flex items-center w-full gap-2 justify-center">
-                    <User size={16} />
-                    <span>Sign In</span>
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
+        
+        <div className="flex items-center space-x-2">
+          <ModeToggle />
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.user_metadata?.avatar_url} alt={user?.user_metadata?.full_name || user.email} />
+                    <AvatarFallback>{user?.user_metadata?.full_name?.slice(0, 2).toUpperCase() || user.email?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuItem className="focus:outline-none">
+                  {user ? user.email : <Skeleton />}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="focus:outline-none" onClick={() => navigate("/auth/profile")}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem className="focus:outline-none" onClick={() => navigate("/auth/account")}>
+                  Account
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="focus:outline-none" onClick={handleSignOut}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={() => navigate("/auth")}>Sign In</Button>
+          )}
         </div>
-      )}
-    </nav>
+      </nav>
+    </header>
   );
 };
 
