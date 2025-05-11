@@ -59,18 +59,17 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
       const fetchPreferences = async () => {
         try {
           // Use a type-safe approach with the Supabase client
-          // We're using a type assertion here to handle the table that might not exist yet
           const { data, error } = await supabase
             .from('user_preferences')
-            .select('settings')
+            .select('feed_preferences')
             .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
           
           // If we have content preferences data, set it
-          if (data?.settings?.content_preferences) {
-            setPreferences(data.settings.content_preferences);
+          if (data?.feed_preferences?.content_preferences) {
+            setPreferences(data.feed_preferences.content_preferences);
           }
         } catch (error) {
           console.error("Error fetching feed preferences:", error);
@@ -121,15 +120,25 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
 
     setLoading(true);
     try {
-      // Using the existing user_preferences table
+      // Fetch current preferences first to update them
+      const { data: currentPreferences } = await supabase
+        .from('user_preferences')
+        .select('feed_preferences')
+        .eq('user_id', user.id)
+        .single();
+        
+      // Prepare the updated feed preferences
+      const updatedFeedPreferences = {
+        ...currentPreferences?.feed_preferences,
+        content_preferences: preferences
+      };
+      
+      // Update the user preferences
       const { error } = await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          settings: {
-            ...DEFAULT_PREFERENCES,
-            content_preferences: preferences
-          },
+          feed_preferences: updatedFeedPreferences,
           updated_at: new Date().toISOString(),
         });
 

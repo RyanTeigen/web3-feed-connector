@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -45,15 +44,15 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
         try {
           const { data, error } = await supabase
             .from('user_preferences')
-            .select('settings')
+            .select('feed_preferences')
             .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
           
           // If we have update settings data, set it
-          if (data?.settings?.update_settings) {
-            setSettings(data.settings.update_settings);
+          if (data?.feed_preferences?.update_settings) {
+            setSettings(data.feed_preferences.update_settings);
           }
         } catch (error) {
           console.error("Error fetching update settings:", error);
@@ -100,14 +99,25 @@ const UpdateSettings = ({ onSave }: UpdateSettingsProps) => {
 
     setLoading(true);
     try {
-      // Using the existing user_preferences table
+      // Fetch current preferences first to update them
+      const { data: currentPreferences } = await supabase
+        .from('user_preferences')
+        .select('feed_preferences')
+        .eq('user_id', user.id)
+        .single();
+        
+      // Prepare the updated feed preferences
+      const updatedFeedPreferences = {
+        ...currentPreferences?.feed_preferences,
+        update_settings: settings
+      };
+      
+      // Update the user preferences
       const { error } = await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          settings: {
-            update_settings: settings
-          },
+          feed_preferences: updatedFeedPreferences,
           updated_at: new Date().toISOString(),
         });
 

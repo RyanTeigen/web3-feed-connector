@@ -28,28 +28,30 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Router>
-        {loading ? (
-          <div className="grid h-screen place-items-center">
-            <span className="loader"></span>
-          </div>
-        ) : (
-          <>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/feeds" element={<FeedsPage />} />
-              <Route path="/feed-customization" element={<FeedCustomizationPage />} />
-              <Route path="/sentiment" element={<SentimentDashboard />} />
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Footer />
-            <Toaster />
-          </>
-        )}
-      </Router>
+      <AuthProvider>
+        <Router>
+          {loading ? (
+            <div className="grid h-screen place-items-center">
+              <span className="loader"></span>
+            </div>
+          ) : (
+            <>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<AboutPage />} />
+                <Route path="/feeds" element={<FeedsPage />} />
+                <Route path="/feed-customization" element={<FeedCustomizationPage />} />
+                <Route path="/sentiment" element={<SentimentDashboard />} />
+                <Route path="/auth" element={<AuthPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Footer />
+              <Toaster />
+            </>
+          )}
+        </Router>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

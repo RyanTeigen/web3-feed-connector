@@ -39,15 +39,15 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
         try {
           const { data, error } = await supabase
             .from('user_preferences')
-            .select('settings')
+            .select('feed_preferences')
             .eq('user_id', user.id)
             .single();
 
           if (error) throw error;
           
           // If we have keyword filters data, set it
-          if (data?.settings?.keyword_filters) {
-            setFilters(data.settings.keyword_filters);
+          if (data?.feed_preferences?.keyword_filters) {
+            setFilters(data.feed_preferences.keyword_filters);
           }
         } catch (error) {
           console.error("Error fetching keyword filters:", error);
@@ -116,14 +116,25 @@ const KeywordFilters = ({ onSave }: KeywordFiltersProps) => {
 
     setLoading(true);
     try {
-      // Using the existing user_preferences table
+      // Fetch current preferences first to update them
+      const { data: currentPreferences } = await supabase
+        .from('user_preferences')
+        .select('feed_preferences')
+        .eq('user_id', user.id)
+        .single();
+        
+      // Prepare the updated feed preferences
+      const updatedFeedPreferences = {
+        ...currentPreferences?.feed_preferences,
+        keyword_filters: filters
+      };
+      
+      // Update the user preferences
       const { error } = await supabase
         .from('user_preferences')
         .upsert({
           user_id: user.id,
-          settings: {
-            keyword_filters: filters
-          },
+          feed_preferences: updatedFeedPreferences,
           updated_at: new Date().toISOString(),
         });
 
