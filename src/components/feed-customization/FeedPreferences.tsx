@@ -30,6 +30,12 @@ interface ContentPreferences {
   showVerifiedOnly: boolean;
 }
 
+// Type for feed preferences from the database
+interface FeedPreferencesData {
+  content_preferences?: ContentPreferences;
+  [key: string]: any;
+}
+
 // Default feed preferences
 const DEFAULT_PREFERENCES: ContentPreferences = {
   contentTypes: {
@@ -68,8 +74,11 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
           if (error) throw error;
           
           // If we have content preferences data, set it
-          if (data?.feed_preferences?.content_preferences) {
-            setPreferences(data.feed_preferences.content_preferences);
+          if (data?.feed_preferences) {
+            const feedPrefs = data.feed_preferences as FeedPreferencesData;
+            if (feedPrefs.content_preferences) {
+              setPreferences(feedPrefs.content_preferences);
+            }
           }
         } catch (error) {
           console.error("Error fetching feed preferences:", error);
@@ -128,8 +137,10 @@ const FeedPreferences = ({ onSave }: FeedPreferencesProps) => {
         .single();
         
       // Prepare the updated feed preferences
+      const currentFeedPrefs = (currentPreferences?.feed_preferences || {}) as FeedPreferencesData;
+      
       const updatedFeedPreferences = {
-        ...currentPreferences?.feed_preferences,
+        ...currentFeedPrefs,
         content_preferences: preferences
       };
       
