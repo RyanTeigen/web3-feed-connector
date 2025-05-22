@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { Web3AuthProvider } from "@/context/Web3AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "@/pages/Index";
@@ -34,28 +35,30 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <Router>
-            {loading ? (
-              <div className="grid h-screen place-items-center">
-                <span className="loader"></span>
-              </div>
-            ) : (
-              <>
-                <Navbar />
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/about" element={<AboutPage />} />
-                  <Route path="/feeds" element={<FeedsPage />} />
-                  <Route path="/feed-customization" element={<FeedCustomizationPage />} />
-                  <Route path="/sentiment" element={<SentimentDashboard />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-                <Footer />
-                <Toaster />
-              </>
-            )}
-          </Router>
+          <Web3AuthProvider>
+            <Router>
+              {loading ? (
+                <div className="grid h-screen place-items-center">
+                  <span className="loader"></span>
+                </div>
+              ) : (
+                <>
+                  <Navbar />
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/about" element={<AboutPage />} />
+                    <Route path="/feeds" element={<FeedsPage />} />
+                    <Route path="/feed-customization" element={<FeedCustomizationPage />} />
+                    <Route path="/sentiment" element={<SentimentDashboard />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                  <Footer />
+                  <Toaster />
+                </>
+              )}
+            </Router>
+          </Web3AuthProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
