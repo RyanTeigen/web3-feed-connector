@@ -8,43 +8,32 @@ import { DiscordFeed } from "./social-feed/DiscordFeed";
 import { TelegramFeed } from "./social-feed/TelegramFeed";
 import { YoutubeFeed } from "./social-feed/YoutubeFeed";
 import { BlogFeed } from "./social-feed/BlogFeed";
+import { ScraperControl } from "./scraper/ScraperControl";
 import { DEFAULT_CONFIG } from "./social-feed/config";
 import { ThemeToggle } from "./ThemeToggle";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useSocialMediaScraper } from "@/hooks/useSocialMediaScraper";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
-
-const fetchSocialFeed = async (platform: string, userId: string) => {
-  try {
-    const { data, error } = await supabase.functions.invoke("fetch-social-feeds", {
-      body: { platform, user_id: userId },
-    });
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Error fetching social feed:", error);
-    throw new Error("Failed to fetch social feed data");
-  }
-};
+import { AlertCircle, Settings } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const SocialFeed = () => {
   const [activeTab, setActiveTab] = useState("twitter");
   const [config, setConfig] = useState(DEFAULT_CONFIG);
+  const [showScraperControl, setShowScraperControl] = useState(false);
   const { user } = useAuth();
   
-  const userId = user?.id || "";
+  const {
+    scrapedContent,
+    isLoadingContent,
+    contentError,
+    getPlatformContent,
+    isScrapingActive
+  } = useSocialMediaScraper();
 
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["socialFeed", activeTab, userId],
-    queryFn: () => fetchSocialFeed(activeTab, userId),
-    enabled: !!userId,
-  });
-
-  if (!userId) {
+  if (!user) {
     return (
       <div className="py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl">
@@ -60,7 +49,7 @@ const SocialFeed = () => {
   }
 
   const renderFeedContent = () => {
-    if (isLoading) {
+    if (isLoadingContent) {
       return (
         <div className="space-y-6">
           {[1, 2, 3].map((i) => (
@@ -79,41 +68,72 @@ const SocialFeed = () => {
       );
     }
 
-    if (isError) {
+    if (contentError) {
       return (
         <Alert variant="destructive" className="mt-4">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {error instanceof Error ? error.message : "Failed to load content"}
+            Failed to load content. Please try refreshing the page.
           </AlertDescription>
         </Alert>
       );
     }
 
+    // Get platform-specific content, fallback to mock data if no scraped content
+    const platformContent = getPlatformContent(activeTab);
+    const hasScrapedContent = platformContent.length > 0;
+
     return (
       <>
+        {isScrapingActive && (
+          <Alert className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Scraping in progress... New content will appear shortly.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <TabsContent value="twitter">
-          <TwitterFeed twitterUrl={config.social_accounts.twitter} feedData={data?.content} />
+          <TwitterFeed 
+            twitterUrl={config.social_accounts.twitter} 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
         
         <TabsContent value="linkedin">
-          <LinkedInFeed linkedinUrl={config.social_accounts.linkedin} feedData={data?.content} />
+          <LinkedInFeed 
+            linkedinUrl={config.social_accounts.linkedin} 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
         
         <TabsContent value="discord">
-          <DiscordFeed discordUrl={config.social_accounts.discord} feedData={data?.content} />
+          <DiscordFeed 
+            discordUrl={config.social_accounts.discord} 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
         
         <TabsContent value="telegram">
-          <TelegramFeed telegramUrl={config.social_accounts.telegram} feedData={data?.content} />
+          <TelegramFeed 
+            telegramUrl={config.social_accounts.telegram} 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
         
         <TabsContent value="youtube">
-          <YoutubeFeed youtubeUrl="https://youtube.com/autheo" feedData={data?.content} />
+          <YoutubeFeed 
+            youtubeUrl="https://youtube.com/autheo" 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
         
         <TabsContent value="blog">
-          <BlogFeed blogUrl="https://blog.autheo.com" feedData={data?.content} />
+          <BlogFeed 
+            blogUrl="https://blog.autheo.com" 
+            feedData={hasScrapedContent ? platformContent : undefined}
+          />
         </TabsContent>
       </>
     );
@@ -122,12 +142,30 @@ const SocialFeed = () => {
   return (
     <div className="py-12 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-6">
           <h2 className="text-3xl font-bold text-center">
             <span className="gradient-text">Autheo Social Feeds</span>
           </h2>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowScraperControl(!showScraperControl)}
+              className="flex items-center gap-2"
+            >
+              <Settings className="h-4 w-4" />
+              Scraper Settings
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
+
+        {/* Scraper Control Panel */}
+        <Collapsible open={showScraperControl} onOpenChange={setShowScraperControl}>
+          <CollapsibleContent className="mb-8">
+            <ScraperControl />
+          </CollapsibleContent>
+        </Collapsible>
         
         <Tabs defaultValue="twitter" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-6 mb-8">
