@@ -107,7 +107,7 @@ class SocialMediaScraperService {
           date: item.date,
           engagement: item.engagement,
           metadata: item.metadata
-        } as StoredContentData,
+        } as any, // Cast to any to satisfy Json type requirement
         fetched_at: new Date().toISOString()
       }));
 
@@ -149,16 +149,16 @@ class SocialMediaScraperService {
 
       return (data || []).map(item => {
         // Type cast the content JSON to our expected structure
-        const contentData = item.content as StoredContentData;
+        const contentData = item.content as unknown as StoredContentData;
         
         return {
           id: item.platform_content_id,
           platform: item.platform,
-          author: contentData.author || 'Unknown',
-          content: contentData.content || '',
-          date: contentData.date || '',
-          engagement: contentData.engagement,
-          metadata: contentData.metadata
+          author: contentData?.author || 'Unknown',
+          content: contentData?.content || '',
+          date: contentData?.date || '',
+          engagement: contentData?.engagement,
+          metadata: contentData?.metadata
         };
       });
     } catch (error) {
