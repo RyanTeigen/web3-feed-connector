@@ -23,6 +23,20 @@ export interface ScraperConfig {
   timeRange?: string;
 }
 
+// Define the structure of content stored in the database
+interface StoredContentData {
+  author: string;
+  content: string;
+  date: string;
+  engagement?: {
+    likes?: number;
+    shares?: number;
+    comments?: number;
+    views?: number;
+  };
+  metadata?: Record<string, any>;
+}
+
 class SocialMediaScraperService {
   private readonly supportedPlatforms = ['twitter', 'linkedin', 'discord', 'telegram', 'youtube', 'blog'];
 
@@ -93,7 +107,7 @@ class SocialMediaScraperService {
           date: item.date,
           engagement: item.engagement,
           metadata: item.metadata
-        },
+        } as StoredContentData,
         fetched_at: new Date().toISOString()
       }));
 
@@ -133,15 +147,20 @@ class SocialMediaScraperService {
 
       if (error) throw error;
 
-      return (data || []).map(item => ({
-        id: item.platform_content_id,
-        platform: item.platform,
-        author: item.content.author,
-        content: item.content.content,
-        date: item.content.date,
-        engagement: item.content.engagement,
-        metadata: item.content.metadata
-      }));
+      return (data || []).map(item => {
+        // Type cast the content JSON to our expected structure
+        const contentData = item.content as StoredContentData;
+        
+        return {
+          id: item.platform_content_id,
+          platform: item.platform,
+          author: contentData.author || 'Unknown',
+          content: contentData.content || '',
+          date: contentData.date || '',
+          engagement: contentData.engagement,
+          metadata: contentData.metadata
+        };
+      });
     } catch (error) {
       console.error('Error fetching stored content:', error);
       return [];
