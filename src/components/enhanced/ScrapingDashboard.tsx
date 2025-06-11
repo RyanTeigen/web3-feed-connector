@@ -220,7 +220,7 @@ export const ScrapingDashboard = () => {
                   {Object.entries(platformCounts).map(([platform, count]) => (
                     <div key={platform} className="flex justify-between items-center">
                       <span className="capitalize">{platform}</span>
-                      <Badge variant="secondary">{count}</Badge>
+                      <Badge variant="secondary">{count as number}</Badge>
                     </div>
                   ))}
                 </div>
