@@ -1,5 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
+import { scrapingEngine } from "./enhanced/ScrapingEngine";
+import { contentProcessor } from "./enhanced/ContentProcessor";
 
 export interface ScrapedContent {
   id: string;
@@ -42,7 +43,7 @@ class SocialMediaScraperService {
 
   async scrapeContent(config: ScraperConfig, userId: string): Promise<ScrapedContent[]> {
     try {
-      console.log('Starting social media scraping with config:', config);
+      console.log('Starting enhanced social media scraping with config:', config);
       
       const results: ScrapedContent[] = [];
       
@@ -52,44 +53,23 @@ class SocialMediaScraperService {
           continue;
         }
 
-        const platformResults = await this.scrapePlatform(platform, config, userId);
+        // Use enhanced scraping engine with retry and rate limiting
+        const platformResults = await scrapingEngine.scrapeWithRetry(platform, config, userId);
         results.push(...platformResults);
       }
 
-      // Store scraped content in database
-      await this.storeScrapedContent(results, userId);
+      // Process content with enhanced pipeline
+      let processedContent = await contentProcessor.processContent(results);
+      processedContent = await contentProcessor.detectDuplicates(processedContent);
+      processedContent = await contentProcessor.enrichWithSentiment(processedContent);
+
+      // Store processed content in database
+      await this.storeScrapedContent(processedContent, userId);
       
-      return results;
+      return processedContent;
     } catch (error) {
-      console.error('Error scraping social media content:', error);
+      console.error('Error in enhanced social media scraping:', error);
       throw error;
-    }
-  }
-
-  private async scrapePlatform(platform: string, config: ScraperConfig, userId: string): Promise<ScrapedContent[]> {
-    console.log(`Scraping ${platform}...`);
-    
-    try {
-      // Call the edge function for actual scraping
-      const { data, error } = await supabase.functions.invoke('scrape-social-media', {
-        body: {
-          platform,
-          userId,
-          keywords: config.keywords || [],
-          maxResults: config.maxResults || 10,
-          timeRange: config.timeRange || '24h'
-        }
-      });
-
-      if (error) {
-        console.error(`Error scraping ${platform}:`, error);
-        return [];
-      }
-
-      return data.content || [];
-    } catch (error) {
-      console.error(`Failed to scrape ${platform}:`, error);
-      return [];
     }
   }
 

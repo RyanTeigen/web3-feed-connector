@@ -11,6 +11,7 @@ import AboutPage from "@/pages/AboutPage";
 import FeedsPage from "@/pages/FeedsPage";
 import SentimentDashboard from "@/pages/SentimentDashboard";
 import AuthPage from "@/pages/AuthPage";
+import ProductionDashboard from "@/pages/ProductionDashboard";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NotFound from "@/pages/NotFound";
