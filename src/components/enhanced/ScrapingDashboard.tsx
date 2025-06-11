@@ -144,7 +144,7 @@ export const ScrapingDashboard = () => {
                       <div>
                         <div className="font-medium capitalize">{platform.platform}</div>
                         <div className="text-sm text-muted-foreground">
-                          {platformCounts[platform.platform] || 0} items scraped
+                          {(platformCounts[platform.platform] || 0)} items scraped
                         </div>
                       </div>
                     </div>
