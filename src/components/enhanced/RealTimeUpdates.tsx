@@ -83,7 +83,7 @@ export const RealTimeUpdates = () => {
 
   const getConnectionBadge = () => {
     const variants = {
-      connected: { variant: 'success' as const, text: 'Connected' },
+      connected: { variant: 'default' as const, text: 'Connected' },
       disconnected: { variant: 'destructive' as const, text: 'Disconnected' },
       connecting: { variant: 'secondary' as const, text: 'Connecting...' }
     };

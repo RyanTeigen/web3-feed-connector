@@ -44,10 +44,10 @@ export const ScrapingDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): "default" | "destructive" | "secondary" | "outline" => {
     switch (status) {
-      case 'healthy': return 'success';
-      case 'rate_limited': return 'warning';
+      case 'healthy': return 'default';
+      case 'rate_limited': return 'secondary';
       case 'error': return 'destructive';
       default: return 'secondary';
     }
@@ -148,7 +148,7 @@ export const ScrapingDashboard = () => {
                         </div>
                       </div>
                     </div>
-                    <Badge variant={getStatusColor(platform.status) as any}>
+                    <Badge variant={getStatusColor(platform.status)}>
                       {platform.status}
                     </Badge>
                   </div>
