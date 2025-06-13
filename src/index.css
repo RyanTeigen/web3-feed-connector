@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -151,6 +150,29 @@
     [role="tab"] {
       @apply flex-shrink-0 text-sm px-3 py-2;
     }
+    
+    /* Native-like interactions */
+    .mobile-card {
+      @apply active:scale-[0.98] transition-transform duration-150;
+    }
+    
+    /* Pull-to-refresh indicator */
+    .pull-to-refresh {
+      @apply fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-secondary to-primary z-50 transform -translate-y-full transition-transform duration-300;
+    }
+    
+    .pull-to-refresh.active {
+      @apply translate-y-0;
+    }
+    
+    /* Safe area adjustments for iOS */
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top);
+    }
+    
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
   }
 }
 
@@ -205,4 +227,45 @@
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Native-like animations */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.3s ease-out;
+}
+
+.fade-in-scale {
+  animation: fadeInScale 0.2s ease-out;
+}
+
+/* Native-like button press effect */
+.btn-press {
+  @apply active:scale-95 transition-transform duration-100;
+}
+
+/* Improved focus states for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
 }

@@ -1,0 +1,32 @@
+
+{
+  "name": "Autheo Social Feeds",
+  "short_name": "Autheo",
+  "description": "Web3 social feed connector with real-time updates",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#3cbcf4",
+  "orientation": "portrait-primary",
+  "categories": ["social", "productivity", "web3"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/placeholder.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/placeholder.svg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false
+}
