@@ -1,7 +1,20 @@
 
 import SocialFeed from "@/components/SocialFeed";
+import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const FeedsPage = () => {
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <MobileHeader title="Social Feeds" showSettings />
+        <SocialFeed />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="py-16 px-4 sm:px-6 lg:px-8">

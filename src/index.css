@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -73,6 +74,24 @@
 
   body {
     @apply bg-background text-foreground;
+    /* Improve mobile scrolling */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Improve touch targets for mobile */
+  button, a, input, textarea, select {
+    @apply min-h-[44px] sm:min-h-auto;
+  }
+  
+  /* Prevent zoom on inputs on iOS */
+  input, textarea, select {
+    font-size: 16px;
+  }
+  
+  @media (min-width: 640px) {
+    input, textarea, select {
+      font-size: 14px;
+    }
   }
   
   /* Add smooth transition for theme changing */
@@ -89,7 +108,7 @@
 /* Web3 custom classes */
 @layer components {
   .web3-card {
-    @apply relative overflow-hidden rounded-xl border border-border/40 bg-card p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_15px_rgba(130,217,255,0.5)];
+    @apply relative overflow-hidden rounded-xl border border-border/40 bg-card p-4 sm:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_15px_rgba(130,217,255,0.5)];
   }
   
   .gradient-text {
@@ -97,7 +116,7 @@
   }
   
   .web3-button {
-    @apply inline-flex h-10 items-center justify-center rounded-md bg-gradient-to-r from-secondary to-white px-4 py-2 text-sm font-medium text-primary transition-all duration-300 hover:shadow-[0_0_15px_rgba(130,217,255,0.5)] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply inline-flex h-12 sm:h-10 items-center justify-center rounded-md bg-gradient-to-r from-secondary to-white px-6 sm:px-4 py-3 sm:py-2 text-base sm:text-sm font-medium text-primary transition-all duration-300 hover:shadow-[0_0_15px_rgba(130,217,255,0.5)] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
   }
 
   /* Light mode specific styles */
@@ -111,6 +130,27 @@
   
   .light .web3-button {
     @apply bg-gradient-to-r from-web3-electric-blue to-web3-vibrant-teal text-white;
+  }
+
+  /* Mobile-specific improvements */
+  @media (max-width: 768px) {
+    .container {
+      @apply px-4;
+    }
+    
+    /* Better spacing for mobile cards */
+    .web3-card {
+      @apply mb-4;
+    }
+    
+    /* Mobile-friendly tabs */
+    [role="tablist"] {
+      @apply overflow-x-auto scrollbar-hide;
+    }
+    
+    [role="tab"] {
+      @apply flex-shrink-0 text-sm px-3 py-2;
+    }
   }
 }
 
@@ -154,5 +194,15 @@
 
 /* Hide stars in light mode */
 .light .stars-container {
+  display: none;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

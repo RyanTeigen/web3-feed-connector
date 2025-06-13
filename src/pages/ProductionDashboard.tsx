@@ -4,9 +4,12 @@ import { RealTimeUpdates } from "@/components/enhanced/RealTimeUpdates";
 import { useAuth } from "@/context/AuthContext";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { MobileHeader } from "@/components/mobile/MobileHeader";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ProductionDashboard = () => {
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   if (!user) {
     return (
@@ -17,6 +20,18 @@ const ProductionDashboard = () => {
             You need to be logged in to access the production dashboard.
           </AlertDescription>
         </Alert>
+      </div>
+    );
+  }
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen bg-background">
+        <MobileHeader title="Dashboard" />
+        <div className="p-4 space-y-6">
+          <ScrapingDashboard />
+          <RealTimeUpdates />
+        </div>
       </div>
     );
   }

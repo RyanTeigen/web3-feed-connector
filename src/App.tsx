@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Routes, Route, BrowserRouter as Router } from "react-router-dom";
+import { Routes, Route, BrowserRouter as Router, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { Web3AuthProvider } from "@/context/Web3AuthContext";
@@ -16,9 +16,40 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import NotFound from "@/pages/NotFound";
 import FeedCustomizationPage from "@/pages/FeedCustomizationPage";
+import { MobileBottomNav } from "@/components/mobile/MobileBottomNav";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Create a client
 const queryClient = new QueryClient();
+
+function AppContent() {
+  const isMobile = useIsMobile();
+  const location = useLocation();
+  
+  // Hide bottom nav on auth page
+  const hideBottomNav = location.pathname === '/auth';
+
+  return (
+    <>
+      {!isMobile && <Navbar />}
+      <div className={`${isMobile ? 'pb-20' : ''}`}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/feeds" element={<FeedsPage />} />
+          <Route path="/feed-customization" element={<FeedCustomizationPage />} />
+          <Route path="/sentiment" element={<SentimentDashboard />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/dashboard" element={<ProductionDashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      {!isMobile && <Footer />}
+      {isMobile && !hideBottomNav && <MobileBottomNav />}
+      <Toaster />
+    </>
+  );
+}
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -43,20 +74,7 @@ function App() {
                   <span className="loader"></span>
                 </div>
               ) : (
-                <>
-                  <Navbar />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/feeds" element={<FeedsPage />} />
-                    <Route path="/feed-customization" element={<FeedCustomizationPage />} />
-                    <Route path="/sentiment" element={<SentimentDashboard />} />
-                    <Route path="/auth" element={<AuthPage />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  <Footer />
-                  <Toaster />
-                </>
+                <AppContent />
               )}
             </Router>
           </Web3AuthProvider>
