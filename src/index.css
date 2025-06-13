@@ -80,7 +80,7 @@
   
   /* Improve touch targets for mobile */
   button, a, input, textarea, select {
-    @apply min-h-[44px] sm:min-h-auto;
+    @apply min-h-[44px] sm:min-h-0;
   }
   
   /* Prevent zoom on inputs on iOS */
