@@ -1,0 +1,15 @@
+# app/services/scrapers/discord.py
+
+from typing import List
+from datetime import datetime
+from app.models.feed import FeedItem
+
+async def fetch_discord_feed() -> List[FeedItem]:
+    return [
+        FeedItem(
+            platform="discord",
+            content="New announcement from Discord server!",
+            timestamp=datetime.utcnow(),
+            metadata={"channel": "announcements"},
+        )
+    ]
