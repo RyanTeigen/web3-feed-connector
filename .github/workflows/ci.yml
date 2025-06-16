@@ -1,0 +1,5 @@
+mkdir -p .github/workflows
+nano .github/workflows/ci.yml  # Paste the above YAML
+git add .github/workflows/ci.yml
+git commit -m "Add GitHub Actions CI workflow"
+git push origin main
