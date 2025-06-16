@@ -1,1 +1,10 @@
 app/services/aggregator.py
+# app/services/aggregator.py
+
+from app.models.feed import FeedResponse, FeedRequest
+from app.models.platform import PlatformPost
+
+class FeedAggregator:
+    def aggregate_feed(self, request: FeedRequest) -> FeedResponse:
+        # Stub: Return an empty list of posts
+        return FeedResponse(posts=[])
